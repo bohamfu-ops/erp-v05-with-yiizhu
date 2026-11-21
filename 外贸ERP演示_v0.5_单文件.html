@@ -1,0 +1,1227 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}</style>
+<title>光数外贸 ERP 演示</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* 布局：左侧导航 + 右侧内容；顶栏为磨砂玻璃，抽屉与弹层为玻璃浮层；浅色＝素白，深色＝墨石 */
+:root{
+  --bg:#F5F5F7; --side:#FBFBFD; --card:#FFFFFF; --card2:#FAFAFC; --line:#E5E5EA; --line2:#F0F0F3;
+  --ink:#1D1D1F; --ink2:#3A3A3C; --muted:#6E6E73; --faint:#8E8E93;
+  --accent:#0071E3; --accent-ink:#0060DF; --accent-soft:#E8F1FD; --on-accent:#FFFFFF;
+  --ok:#248A3D; --ok-soft:#E9F7EE; --warn:#A65400; --warn-soft:#FFF4E5; --bad:#C7251B; --bad-soft:#FDECEC;
+  --yz:#4B49C9; --yz-soft:#EEEDFC; --mute-soft:#F0F0F3;
+  --glass:rgba(245,245,247,.74); --glass2:rgba(255,255,255,.82); --scrim:rgba(0,0,0,.18);
+  --shadow:0 18px 40px -16px rgba(0,0,0,.22); --shadow-s:0 1px 2px rgba(0,0,0,.06);
+  --hover:#F5F8FF; --seg:#E8E8ED; --seg-on:#FFFFFF; --nav-on:#E8E8ED; --nav-hover:#F0F0F3; --input:#FFFFFF;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  --font-d:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  color-scheme:light;
+}
+:root[data-skin="dark"]{
+  --bg:#141416; --side:#1B1B1E; --card:#1C1C1F; --card2:#202023; --line:#2C2C30; --line2:#242427;
+  --ink:#F2F2F4; --ink2:#D1D1D6; --muted:#98989D; --faint:#76767B;
+  --accent:#3D6FD1; --accent-ink:#8EB4F2; --accent-soft:#1F2A3C; --on-accent:#FFFFFF;
+  --ok:#80C997; --ok-soft:#1C3024; --warn:#DDB16B; --warn-soft:#352B1C; --bad:#EE8C82; --bad-soft:#3A1F1E;
+  --yz:#B3B0F7; --yz-soft:#27263D; --mute-soft:#2A2A2D;
+  --glass:rgba(20,20,22,.78); --glass2:rgba(34,34,37,.86); --scrim:rgba(0,0,0,.45);
+  --shadow:0 18px 40px -16px rgba(0,0,0,.75); --shadow-s:0 1px 2px rgba(0,0,0,.4);
+  --hover:#222428; --seg:#2A2A2D; --seg-on:#3A3A3E; --nav-on:#2C2C30; --nav-hover:#232326; --input:#232326;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:13.5px;line-height:1.5;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 45%,transparent);outline-offset:2px;border-radius:6px}
+
+/* ---------- 框架 ---------- */
+.app{min-height:100%}
+.side{position:fixed;left:0;top:0;bottom:0;width:236px;background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:16px 10px 12px;overflow-y:auto;z-index:20;transition:background .3s}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 10px 16px}
+.brand .mk{width:30px;height:30px;border-radius:9px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-weight:700;font-size:14px;font-family:var(--font-d)}
+.brand b{display:block;font-family:var(--font-d);font-size:15px;letter-spacing:-.01em}
+.brand small{display:block;color:var(--faint);font-size:11px}
+.grp{font-size:11px;font-weight:600;color:var(--faint);padding:14px 10px 4px;letter-spacing:.06em}
+.nav{display:flex;align-items:center;gap:10px;width:100%;padding:7px 10px;border:0;background:none;border-radius:8px;text-align:left;cursor:pointer;color:var(--ink);transition:background .15s}
+.nav:hover{background:var(--nav-hover)}
+.nav[aria-current="page"]{background:var(--nav-on);font-weight:600}
+.nav[aria-current="page"] .i{stroke:var(--accent-ink)}
+.nav .ct{margin-left:auto;font-size:11px;color:var(--faint);font-variant-numeric:tabular-nums}
+.nav .ct.hot{background:var(--bad);color:#fff;border-radius:999px;padding:0 6px;font-weight:600}
+.side .foot{margin-top:auto;padding:14px 10px 0;font-size:11px;color:var(--faint);line-height:1.6;border-top:1px solid var(--line);margin-inline:6px}
+.i{width:16px;height:16px;flex:none;stroke:var(--muted);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.mainwrap{min-width:0;display:flex;flex-direction:column;margin-left:236px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:15;display:flex;align-items:center;gap:12px;padding:12px max(24px,env(safe-area-inset-right,0px)) 12px 24px;background:var(--glass);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--line);transition:background .3s}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--glass)}
+.crumb{display:flex;gap:6px;align-items:center;color:var(--faint);font-size:12.5px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crumb b{color:var(--ink);font-weight:600}
+.menu{display:none}
+.search{position:relative;margin-left:auto;width:min(320px,40vw)}
+.search input{width:100%;padding:7px 12px 7px 32px;border-radius:9px;border:1px solid transparent;background:var(--seg);outline:none;transition:border .15s,background .15s}
+.search input:focus{background:var(--input);border-color:var(--accent)}
+.search .i{position:absolute;left:10px;top:50%;transform:translateY(-50%)}
+.results{position:absolute;right:0;left:0;top:calc(100% + 6px);background:var(--glass2);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;display:grid;gap:2px;max-height:360px;overflow:auto}
+.results button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:8px;cursor:pointer}
+.results button:hover,.results button:focus-visible{background:var(--hover)}
+.results small{color:var(--faint);margin-left:auto}
+.skin{display:flex;padding:2px;border-radius:9px;background:var(--seg)}
+.skin button{border:0;background:none;padding:5px 9px;border-radius:7px;display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);cursor:pointer;transition:background .2s,color .2s}
+.skin button[aria-pressed="true"]{background:var(--seg-on);color:var(--ink);font-weight:600;box-shadow:var(--shadow-s)}
+.who{width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);display:grid;place-items:center;font-weight:600;font-size:12px;flex:none}
+.main{padding:24px max(24px,env(safe-area-inset-right,0px)) 56px 24px;max-width:1360px;width:100%}
+.view{animation:rise .38s cubic-bezier(.2,.8,.2,1)}
+@keyframes rise{from{opacity:.35;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ---------- 页面元素 ---------- */
+.ph{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 20px;margin-bottom:20px}
+.ph h1{margin:0;font-family:var(--font-d);font-size:30px;font-weight:700;letter-spacing:-.025em;text-wrap:balance}
+.ph p{margin:4px 0 0;color:var(--muted);max-width:70ch}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0;transition:background .3s,border-color .3s}
+.card h3{margin:0 0 12px;font-family:var(--font-d);font-size:15px;font-weight:650;display:flex;flex-wrap:wrap;align-items:baseline;gap:8px}
+.card h3 small{font-weight:400;color:var(--faint);font-size:12px}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g32{grid-template-columns:minmax(0,3fr) minmax(0,2fr)}.g23{grid-template-columns:minmax(0,2fr) minmax(0,3fr)}.g21{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+.mt{margin-top:14px}
+.kpi{display:grid;gap:4px;transition:transform .25s,box-shadow .25s}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.kpi .k{font-size:12px;color:var(--muted)}
+.kpi .v{font-family:var(--font-d);font-size:24px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.kpi .d{font-size:11.5px;color:var(--faint)}
+.kpi .row{display:flex;justify-content:space-between;align-items:flex-end;gap:8px}
+.up{color:var(--ok)}.dn{color:var(--bad)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.card .tbl{border-radius:10px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th{font-size:11.5px;font-weight:600;color:var(--muted);text-align:left;padding:9px 12px;background:var(--card2);border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--line2);white-space:nowrap;vertical-align:middle}
+tr:last-child td{border-bottom:0}
+th.n,td.n{text-align:right}
+tr.click{cursor:pointer}
+tr.click:hover td{background:var(--hover)}
+tr.sel td{background:var(--accent-soft)}
+td.wrap,.wrap{white-space:normal}
+.m{font-family:var(--mono);font-size:12px;letter-spacing:-.01em}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.p-run{background:var(--accent-soft);color:var(--accent-ink)}.p-ok{background:var(--ok-soft);color:var(--ok)}.p-warn{background:var(--warn-soft);color:var(--warn)}
+.p-bad{background:var(--bad-soft);color:var(--bad)}.p-mute{background:var(--mute-soft);color:var(--muted)}.p-yz{background:var(--yz-soft);color:var(--yz)}
+.tag{font-size:10.5px;font-weight:600;padding:1px 7px;border-radius:5px;white-space:nowrap}
+.tag.yz{background:var(--yz-soft);color:var(--yz)}.tag.own{background:var(--mute-soft);color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;border:1px solid var(--line);background:var(--card);font-weight:600;font-size:12.5px;cursor:pointer;white-space:nowrap;transition:transform .15s,background .15s,border-color .15s}
+.btn:hover{background:var(--hover)}
+.btn:active{transform:scale(.98)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.pri:hover{filter:brightness(1.07);background:var(--accent)}
+.btn.dng{color:var(--bad)}
+.btn.sm{padding:4px 10px;font-size:12px;border-radius:7px}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.btn .i{width:14px;height:14px}
+.btn.pri .i{stroke:var(--on-accent)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.filters{display:inline-flex;flex-wrap:wrap;padding:2px;border-radius:9px;background:var(--seg);gap:2px}
+.filters button{border:0;background:none;padding:5px 12px;border-radius:7px;font-size:12.5px;color:var(--muted);cursor:pointer;transition:background .2s,color .2s}
+.filters button[aria-pressed="true"]{background:var(--seg-on);color:var(--ink);font-weight:600;box-shadow:var(--shadow-s)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:-4px -4px 16px;padding:0 4px;overflow-x:auto}
+.tabs button{border:0;background:none;padding:9px 12px;font-size:13px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--ink);font-weight:600;border-bottom-color:var(--accent)}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px 18px}
+.kv>div{display:grid;gap:2px;min-width:0}
+.kv span{font-size:11.5px;color:var(--faint)}
+.kv.sep{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+.note{color:var(--muted);font-size:12.5px;margin:10px 0 0;line-height:1.65}
+.banner{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-radius:11px;font-size:12.5px;line-height:1.6;margin-bottom:14px}
+.banner b{white-space:nowrap}
+.banner.own{background:var(--mute-soft)}.banner.yz{background:var(--yz-soft)}.banner.yz b{color:var(--yz)}
+.banner.warn{background:var(--warn-soft)}.banner.warn b{color:var(--warn)}.banner.bad{background:var(--bad-soft)}.banner.bad b{color:var(--bad)}
+.banner.ok{background:var(--ok-soft)}.banner.ok b{color:var(--ok)}
+.stepper{display:flex;gap:0;overflow-x:auto;margin:18px 0 4px;padding-bottom:4px}
+.stepper .st{flex:1 0 72px;display:grid;justify-items:center;gap:6px;font-size:11.5px;color:var(--faint);position:relative;text-align:center}
+.stepper .st::before{content:"";position:absolute;top:10px;left:-50%;right:50%;height:2px;background:var(--line)}
+.stepper .st:first-child::before{display:none}
+.stepper .st.done::before,.stepper .st.now::before{background:var(--accent)}
+.stepper .dot{width:22px;height:22px;border-radius:50%;background:var(--card);border:2px solid var(--line);display:grid;place-items:center;position:relative;z-index:1}
+.stepper .done .dot{background:var(--accent);border-color:var(--accent)}
+.stepper .done .dot .i{stroke:#fff;width:12px;height:12px;stroke-width:2.6}
+.stepper .now{color:var(--ink);font-weight:600}
+.stepper .now .dot{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.form label,.fb{display:grid;gap:5px;font-size:12px;color:var(--muted)}
+input[type=number],input[type=text],input[type=date],select,textarea{background:var(--input);border:1px solid var(--line);border-radius:8px;padding:7px 10px;color:var(--ink);font-size:13px;width:100%;min-width:0}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+textarea{resize:vertical;line-height:1.6}
+.chk{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer}
+.chk input{width:16px;height:16px;accent-color:var(--accent)}
+.res{display:grid;gap:0}
+.res>div{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line2)}
+.res>div:last-child{border-bottom:0}
+.res .big{font-family:var(--font-d);font-size:18px;font-weight:700}
+svg.chart text{font-size:11px;fill:var(--faint);font-family:var(--font)}
+.sp{width:88px;height:32px;flex:none}
+.back{display:inline-flex;align-items:center;gap:6px;border:0;background:none;color:var(--accent-ink);cursor:pointer;padding:0;margin-bottom:12px;font-size:13px}
+.back .i{stroke:var(--accent-ink)}
+
+/* 看板 */
+.kanban{display:grid;grid-template-columns:repeat(6,minmax(190px,1fr));gap:12px;overflow-x:auto;padding-bottom:6px}
+.col{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:10px;display:grid;gap:8px;align-content:start;min-height:200px}
+.col h4{margin:2px 4px 2px;font-size:12.5px;display:flex;justify-content:space-between;color:var(--muted)}
+.col h4 span{font-variant-numeric:tabular-nums}
+.col h4 .tag{margin-left:6px}
+.kc{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:10px 11px;display:grid;gap:4px;transition:transform .2s,box-shadow .2s}
+.kc:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.kc.late{border-color:color-mix(in srgb,var(--bad) 50%,var(--line))}
+.kc .t{font-weight:650;font-family:var(--mono);font-size:12px}
+.kc .s{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kc .f{display:flex;justify-content:space-between;align-items:center;margin-top:4px;font-size:11.5px}
+
+/* 追溯树 */
+.trace{display:grid;gap:0}
+.tn{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:center;position:relative;padding:9px 0}
+.tn:not(:last-child)::after{content:"";position:absolute;left:13px;top:30px;bottom:-9px;width:2px;background:var(--line)}
+.tn .dot{width:14px;height:14px;border-radius:50%;margin-left:6px;position:relative;z-index:1;border:2px solid var(--card)}
+.tn .d{background:var(--ok)}.tn .a{background:var(--accent);animation:breathe 2.8s ease-in-out infinite}.tn .w{background:var(--line)}
+.tn .lbl b{display:block;font-size:13px}
+.tn .lbl span{font-size:12px;color:var(--muted)}
+.tn.sub{padding-left:22px}
+.tn.sub::after{left:35px}
+@keyframes breathe{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* 抽屉 */
+.layer{position:fixed;inset:0;z-index:40;background:var(--scrim);animation:fade .2s}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);z-index:41;background:var(--glass2);backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);border-left:1px solid var(--line);box-shadow:var(--shadow);overflow-y:auto;padding:calc(20px + env(safe-area-inset-top,0px)) max(22px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) 22px;animation:slide .32s cubic-bezier(.2,.8,.2,1)}
+.drawer h2{margin:0;font-family:var(--font-d);font-size:21px;letter-spacing:-.015em}
+.drawer h3{font-family:var(--font-d);font-size:14px;margin:22px 0 10px}
+.dh{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:16px}
+.x{border:0;background:var(--seg);width:30px;height:30px;border-radius:50%;display:grid;place-items:center;cursor:pointer;flex:none}
+@keyframes slide{from{transform:translateX(40px);opacity:.3}to{transform:none;opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.mini>div{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:10px 12px;display:grid;gap:2px}
+.mini span{font-size:11px;color:var(--faint)}
+.mini b{font-family:var(--font-d);font-size:16px;font-variant-numeric:tabular-nums}
+.timeline{display:grid;gap:10px}
+.timeline>div{display:grid;grid-template-columns:44px 10px minmax(0,1fr);gap:10px;align-items:start;font-size:12.5px}
+.timeline .t{color:var(--faint);font-variant-numeric:tabular-nums}
+.timeline .d{width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:6px}
+.chat{display:grid;gap:8px;background:var(--card2);border-radius:12px;padding:12px;border:1px solid var(--line)}
+.bubble{max-width:82%;padding:8px 11px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-size:12.5px}
+.bubble.me{justify-self:end;background:var(--accent);border-color:var(--accent);color:#fff}
+.bubble small{display:block;font-size:10.5px;opacity:.7;margin-bottom:2px}
+
+/* 需求确认 */
+.req-sum{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:6px 0 12px}
+.req-sum div{background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:10px;text-align:center}
+.req-sum b{display:block;font-family:var(--font-d);font-size:22px}
+.req-sum span{font-size:12px;color:var(--muted)}
+.req-prog{height:6px;background:var(--seg);border-radius:99px;overflow:hidden}
+.req-prog i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .4s}
+.req-group{margin-top:28px}
+.req-group h2{font-family:var(--font-d);font-size:19px;margin:0 0 12px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.req-group h2 small{font-size:12.5px;font-weight:400;color:var(--faint)}
+.req-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px}
+.req{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px;display:grid;gap:10px;align-content:start;transition:border-color .2s}
+.req[data-c="yes"]{border-color:color-mix(in srgb,var(--ok) 55%,var(--line))}
+.req[data-c="no"]{opacity:.7}
+.req .hd{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.req .hd b{font-size:14px}
+.rec{font-size:10.5px;font-weight:600;padding:1px 7px;border-radius:5px;white-space:nowrap}
+.rec.rm{background:var(--bad-soft);color:var(--bad)}.rec.r1{background:var(--accent-soft);color:var(--accent-ink)}.rec.r2{background:var(--yz-soft);color:var(--yz)}.rec.ro{background:var(--mute-soft);color:var(--muted)}
+.rec.new{background:var(--ok-soft);color:var(--ok)}
+.scn{display:grid;grid-template-columns:36px minmax(0,1fr);gap:4px 8px;margin:0;font-size:12.5px}
+.scn dt{color:var(--faint)}.scn dd{margin:0}
+.why{font-size:12px;color:var(--muted);background:var(--card2);border-radius:8px;padding:7px 10px}
+.choose{display:flex;flex-wrap:wrap;gap:6px}
+.choose button{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:4px 11px;font-size:12px;cursor:pointer}
+.choose button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.choose .go{margin-left:auto;border:0;color:var(--accent-ink);background:none;display:inline-flex;align-items:center;gap:4px}
+.choose .go .i{stroke:var(--accent-ink);width:13px;height:13px}
+.export textarea{font-family:var(--mono);font-size:12px;min-height:180px}
+
+/* 映射 */
+.map{display:grid;grid-template-columns:minmax(0,1fr) 30px minmax(0,1.4fr);gap:8px;align-items:center}
+.map .old{font-family:var(--mono);font-size:12px;background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.map .arr{text-align:center;color:var(--faint)}
+.lvl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.lvl .chip{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;background:var(--card)}
+.lvl .chip.on{background:var(--accent-soft);color:var(--accent-ink);border-color:transparent;font-weight:600}
+.lvl .sep{color:var(--faint)}
+.phone{border:1px solid var(--line);border-radius:26px;padding:14px;background:var(--card2);max-width:300px;margin:0 auto}
+.pc{background:var(--card);border-radius:14px;padding:12px;font-size:12.5px;border:1px solid var(--line)}
+.pc h5{margin:0 0 6px;font-size:13px}
+.aging{display:flex;height:12px;border-radius:99px;overflow:hidden;background:var(--seg)}
+.aging i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin-top:10px}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--glass2);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:12px;padding:10px 16px;font-size:13px;font-weight:500;animation:pop .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes pop{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+
+@media (max-width:1100px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g32,.g23,.g21,.g3{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:900px){
+  .mainwrap{margin-left:0}
+  .side{width:260px;transform:translateX(-102%);transition:transform .3s;box-shadow:var(--shadow);padding-top:calc(16px + env(safe-area-inset-top,0px));padding-left:max(10px,env(safe-area-inset-left,0px))}
+  .side.open{transform:none}
+  .menu{display:grid;place-items:center;width:32px;height:32px;border-radius:8px;border:0;background:var(--seg);cursor:pointer;flex:none}
+  .top{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .g2,.g4{grid-template-columns:minmax(0,1fr)}
+  .form{grid-template-columns:minmax(0,1fr)}
+  .skin span{display:none}
+  .search{width:auto;flex:1}
+  .ph h1{font-size:25px}
+  .mini{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<script>
+/* 在第一次绘制前决定浅色或深色，避免闪烁 */
+(function () {
+  var s = null, r = document.documentElement, t = r.getAttribute('data-theme');
+  try { s = localStorage.getItem('erp5-skin'); } catch (e) {}
+  r.setAttribute('data-skin', s || (t === 'dark' || t === 'light' ? t : (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')));
+})();
+</script>
+
+<div class="app">
+  <aside class="side" id="side" aria-label="主导航"></aside>
+  <div class="mainwrap">
+    <header class="top" id="top"></header>
+    <main class="main" id="main"></main>
+  </div>
+</div>
+<div id="layer"></div>
+<div class="toast" id="toast" role="status" hidden></div>
+<script>
+/* ================= 基础工具 ================= */
+const $ = id => document.getElementById(id);
+const fmt = (n, d = 0) => Number(n).toLocaleString('zh-CN', { minimumFractionDigits: d, maximumFractionDigits: d });
+const esc = t => String(t).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+const TODAY = new Date(2026, 10, 18);
+const md = s => { const [m, d] = s.split('-').map(Number); return new Date(2026, m - 1, d); };
+const daysPast = s => Math.round((TODAY - md(s)) / 864e5);
+const S = {
+  view: 'dash', arg: null, tab: 'lines', drawer: null, choice: {}, note: {},
+  custF: '全部', scF: '全部', recSel: 'SK-1188', shipSel: 'SH-2611-03', traceSel: 'PI20261103KEP', sampleF: '全部', arF: '全部', perfRule: 'gp', perfCash: true,
+  q: { cust: 'C-304', prod: 'C91QS100LR4-A2', cost: 680, rebate: 13, fx: 7.1432, freight: 0.9, qty: 300, comm: 2, margin: 12, extra: 4 }
+};
+try { const c = JSON.parse(localStorage.getItem('erp5-req') || '{}'); if (c && typeof c === 'object') S.choice = c; } catch (_) {}
+try { const n = JSON.parse(localStorage.getItem('erp5-note') || '{}'); if (n && typeof n === 'object') S.note = n; } catch (_) {}
+
+/* ================= 示例数据（全部为虚构） ================= */
+function seed() {
+  return {
+    customers: [
+      { id: 'C-301', name: 'Kepler Telecom GmbH', short: 'Kepler', country: '德国', cc: 'DE', cur: 'USD', level: 'A', sales: '林晓', pool: '私海', last: '2 天前', type: '外销', yz: 'N0042', contact: 'Jonas Weber（采购经理）', ch: '邮件', credit: 150000, terms: '30% 订金，出货前付清',
+        follow: [['11-16', '邮件', '确认追加 300 只 10G LR，交期改 11-28'], ['11-03', '视频会议', 'PI 确认，订金三天内付'], ['10-21', '邮件', '100G LR4 样品测试通过']],
+        chat: [['客户', '11-16 15:02', 'Can you add 300 pcs of 10G LR to the current PI?'], ['我', '11-16 15:20', 'Yes. Updated PI will be sent today, lead time 11/28.'], ['客户', '11-16 15:22', 'Perfect, thanks Lin.']] },
+      { id: 'C-302', name: 'Altamira Networks S.A. de C.V.', short: 'Altamira', country: '墨西哥', cc: 'MX', cur: 'USD', level: 'A', sales: '陈一凡', pool: '私海', last: '昨天', type: '外销', yz: 'N0051', contact: 'Lucía Romero（技术采购）', ch: 'WhatsApp', credit: 120000, terms: '30% 订金，见提单副本付清',
+        follow: [['11-17', 'WhatsApp', '客户要求改中性包装＋英文说明书'], ['11-09', '快递', '寄出 100G LR4 样品 4 只'], ['10-28', 'WhatsApp', 'PI 确认']],
+        chat: [['客户', '11-17 09:41', 'Please ship with neutral packing and English manual.'], ['我', '11-17 09:55', 'Noted, change order submitted. No extra cost.']] },
+      { id: 'C-303', name: 'Saigon FiberLink JSC', short: 'Saigon FL', country: '越南', cc: 'VN', cur: 'USD', level: 'B', sales: '林晓', pool: '私海', last: '6 天前', type: '外销', yz: 'N0063', contact: 'Nguyen Thu Ha（采购）', ch: 'Zalo', credit: 60000, terms: '全款发货',
+        follow: [['11-12', 'Zalo', '已签收，询问下一批 CWDM 价格'], ['10-21', 'Zalo', 'PI 确认，全款已付']],
+        chat: [['客户', '11-12 10:05', 'Goods received. Price for next 6,000 pcs?'], ['我', '11-12 10:30', 'Will send quotation by Friday.']] },
+      { id: 'C-304', name: 'Bangkok NetOps Co., Ltd.', short: 'BKK NetOps', country: '泰国', cc: 'TH', cur: 'USD', level: 'B', sales: '周可', pool: '私海', last: '今天', type: '外销', yz: 'N0067', contact: 'Somchai P.（老板）', ch: 'LINE', credit: 50000, terms: '30% 订金，到货后 20 天付清',
+        follow: [['11-18', 'LINE', '催收尾款，客户说月底前付'], ['11-17', 'LINE', '询价 100G LR4 300 只'], ['11-08', 'LINE', '反映 12 只 10G LR 的 DDM 读数异常']],
+        chat: [['我', '11-18 10:12', 'Kindly arrange the balance USD 26,320, it is 12 days overdue.'], ['客户', '11-18 10:40', 'Will pay before month end.']] },
+      { id: 'C-305', name: 'Manila Opticom Inc.', short: 'Manila Opticom', country: '菲律宾', cc: 'PH', cur: 'USD', level: 'C', sales: '陈一凡', pool: '私海', last: '4 天前', type: '外销', yz: 'N0072', contact: 'Paolo Reyes（采购）', ch: 'WhatsApp', credit: 30000, terms: '30% 订金，出货前付清',
+        follow: [['11-14', 'WhatsApp', '订金由香港贸易公司代付'], ['11-09', 'WhatsApp', 'PI 确认 GPON 1,200 只']],
+        chat: [['客户', '11-14 18:20', 'Deposit paid by our HK partner, Optimax Trading.'], ['我', '11-14 18:31', 'Please send a payment authorization letter.']] },
+      { id: 'C-306', name: 'PT Jakarta LinkWorks', short: 'Jakarta LW', country: '印尼', cc: 'ID', cur: 'USD', level: 'C', sales: '—', pool: '公海', last: '35 天前', type: '外销', yz: '—', contact: 'Budi S.', ch: 'WhatsApp', credit: 20000, terms: '—',
+        follow: [['10-14', 'WhatsApp', '询价 10G LR 800 只，提到需要 SDPPI 认证']], chat: [['客户', '10-14 11:02', 'Do you have SDPPI certificate?']] },
+      { id: 'C-307', name: '深圳云帆网络科技有限公司', short: '云帆网络', country: '中国', cc: 'CN', cur: 'CNY', level: 'B', sales: '周可', pool: '私海', last: '今天', type: '内销', yz: 'N0018', contact: '刘工（采购）', ch: '微信', credit: 500000, terms: '货到 30 天',
+        follow: [['11-18', '微信', '确认 11-30 送货']], chat: [['客户', '11-18 08:50', '25G 那批 11 月底能到吗？'], ['我', '11-18 09:02', '可以，排在 11 月 30 日。']] }
+    ],
+    products: [
+      { code: 'C91QS100LR4-A2', inner: '91QS100LR4-A2', name: '100G QSFP28 LR4 10km', hs: '8517.6200', kg: 0.12, cost: 680, rebate: 13 },
+      { code: 'C91SP10LR-D1', inner: '91SP10LR-D1', name: '10G SFP+ LR 1310nm 10km', hs: '8517.6200', kg: 0.05, cost: 58, rebate: 13 },
+      { code: 'C91SP25SR-B1', inner: '91SP25SR-B1', name: '25G SFP28 SR 850nm 100m', hs: '8517.6200', kg: 0.05, cost: 72, rebate: 13 },
+      { code: 'C91SPCW55-40', inner: '91SPCW55-40', name: '1.25G SFP CWDM 1550nm 40km', hs: '8517.6200', kg: 0.05, cost: 38, rebate: 13 },
+      { code: 'C91GPON-CP', inner: '91GPON-CP', name: 'GPON OLT Class C+ SFP', hs: '8517.6200', kg: 0.05, cost: 96, rebate: 13 }
+    ],
+    quotes: [
+      { id: 'BJ2026111702', ver: 1, cust: 'C-304', prod: 'C91QS100LR4-A2', qty: 300, price: 121.0, margin: 9.4, status: '待审批', att: 2, sales: '周可' },
+      { id: 'BJ2026111401', ver: 1, cust: 'C-306', prod: 'C91SP10LR-D1', qty: 800, price: 10.4, margin: 18.1, status: '已发客户', att: 1, sales: '林晓' },
+      { id: 'BJ2026110301', ver: 3, cust: 'C-301', prod: 'C91QS100LR4-A2', qty: 200, price: 128.0, margin: 15.8, status: '已转合同', pi: 'PI20261103KEP', att: 3, sales: '林晓' },
+      { id: 'BJ2026102501', ver: 2, cust: 'C-302', prod: 'C91SP25SR-B1', qty: 3000, price: 14.6, margin: 16.4, status: '已转合同', pi: 'PI20261028ALT', att: 2, sales: '陈一凡' }
+    ],
+    quoteVers: { BJ2026110301: [['V1', '10-21', 'USD 136.00', '首次报价'], ['V2', '10-28', 'USD 131.00', '客户要求 200 只以上降价'], ['V3', '11-02', 'USD 128.00', '加订 10G LR 1,500 只打包价']] },
+    contracts: [
+      { pi: 'PI20261103KEP', xs: 'XS20261100071', cust: 'C-301', type: '外销', term: 'FOB 深圳', cur: 'USD', sales: '林晓', lines: [['C91QS100LR4-A2', 200, 128.0], ['C91SP10LR-D1', 1500, 9.8]], node: 3, ver: 2,
+        pay: [['订金 30%', 12090, '11-06', '已收'], ['出货前 70%', 28210, '11-28', '未收']], wo: ['WO20261116007', 'WO20261116008'], ww: 'WW20261116001', ck: '', xh: '', zp: '', est: 61200, act: null, co: '—', late: 0, use: '量产' },
+      { pi: 'PI20261028ALT', xs: 'XS20261100064', cust: 'C-302', type: '外销', term: 'CIP 墨西哥城', cur: 'USD', sales: '陈一凡', lines: [['C91SP25SR-B1', 3000, 14.6]], node: 5, ver: 1,
+        pay: [['订金 30%', 13140, '10-30', '已收'], ['见提单副本 70%', 30660, '12-05', '到账待认领']], wo: ['WO20261102015'], ww: '', ck: 'CK2026111702', xh: '', zp: '', est: 52300, act: null, co: '—', late: 0, use: '量产' },
+      { pi: 'PI20261021SGF', xs: 'XS20261000058', cust: 'C-303', type: '外销', term: 'CPT 胡志明', cur: 'USD', sales: '林晓', lines: [['C91SPCW55-40', 4000, 6.2]], node: 10, ver: 1,
+        pay: [['全款', 24800, '11-10', '已收']], wo: ['WO20261024011'], ww: '', ck: 'CK2026110402', xh: 'XH2026110503', zp: 'ZP2026110501', est: 27900, act: 27120, co: 'Form E', late: 0, use: '量产' },
+      { pi: 'PI20261015BKN', xs: 'XS20261000049', cust: 'C-304', type: '外销', term: 'FOB 深圳', cur: 'USD', sales: '周可', lines: [['C91SP10LR-D1', 3000, 9.5], ['C91GPON-CP', 500, 18.2]], node: 9, ver: 1,
+        pay: [['订金 30%', 11280, '10-17', '已收'], ['尾款 70%', 26320, '11-06', '逾期']], wo: ['WO20261018004'], ww: '', ck: 'CK2026102902', xh: 'XH2026103001', zp: 'ZP2026102702', est: 46800, act: null, co: 'RCEP', late: 12, use: '量产' },
+      { pi: 'PI20261009MNO', xs: '', cust: 'C-305', type: '外销', term: 'CPT 马尼拉', cur: 'USD', sales: '陈一凡', lines: [['C91GPON-CP', 1200, 17.6]], node: 2, ver: 1,
+        pay: [['订金 30%', 6336, '11-14', '到账待认领'], ['出货前 70%', 14784, '12-10', '未收']], wo: [], ww: '', ck: '', xh: '', zp: '', est: 21400, act: null, co: 'Form E', late: 0, use: '量产', block: '信用额度待审批，暂不下单到易助' },
+      { pi: 'HT20261108YF', xs: 'XS20261100052', cust: 'C-307', type: '内销', term: '送货上门', cur: 'CNY', sales: '周可', lines: [['C91SP25SR-B1', 2000, 98.0]], node: 3, ver: 1,
+        pay: [['货到 30 天', 196000, '12-30', '未收']], wo: ['WO20261113055'], ww: '', ck: '', xh: '', zp: '', est: 33600, act: null, co: '—', late: 0, use: '量产' }
+    ],
+    changes: [
+      { id: 'BG-0013', pi: 'PI20261028ALT', ver: '002', date: '11-17', diff: [['包装', '标准彩盒', '中性包装＋英文说明书'], ['标签', '贵司 Logo', '无 Logo']], reason: '客户要求中性包装', st: '待审批', by: '陈一凡' },
+      { id: 'BG-0012', pi: 'PI20261103KEP', ver: '002', date: '11-12', diff: [['C91SP10LR-D1 数量', '1,200', '1,500'], ['交期', '11-25', '11-28'], ['合同金额', 'USD 37,360.00', 'USD 40,300.00']], reason: '客户追加 300 只', st: '已同步易助', by: '林晓' }
+    ],
+    samples: [
+      { id: 'YP-0033', cust: 'C-304', prod: 'C91QS100LR4-A2', qty: 2, out: '11-18', due: '12-18', jc: '', st: '待借出', note: '客户评估 100G 方案' },
+      { id: 'YP-0031', cust: 'C-302', prod: 'C91QS100LR4-A2', qty: 4, out: '11-09', due: '12-09', jc: 'JC2026110901', st: '测试中', note: '客户实验室兼容性测试' },
+      { id: 'YP-0028', cust: 'C-301', prod: 'C91SP25SR-B1', qty: 10, out: '10-15', due: '11-15', jc: 'JC2026101502', st: '逾期未还', note: '客户说测试完会归还 6 只' },
+      { id: 'YP-0024', cust: 'C-303', prod: 'C91SPCW55-40', qty: 6, out: '09-20', due: '10-20', jc: 'JC2026092001', st: '已转订单', note: '测试通过，转为 PI20261021SGF', pi: 'PI20261021SGF' }
+    ],
+    receipts: [
+      { id: 'SK-1188', date: '11-17', payer: 'ALTAMIRA NETWORKS S.A. DE C.V.', amt: 30660, cur: 'USD', bank: '中国银行 美元户', claimed: null },
+      { id: 'SK-1186', date: '11-14', payer: 'OPTIMAX TRADING LIMITED (HK)', amt: 6336, cur: 'USD', bank: '跨境收款平台', claimed: null },
+      { id: 'SK-1179', date: '11-06', payer: 'KEPLER TELECOM GMBH', amt: 12090, cur: 'USD', bank: '中国银行 美元户', claimed: 'PI20261103KEP · 订金 30%', rate: 7.1432, yz: '收款单 SK2026110601 已核销' }
+    ],
+    ar: [
+      { zp: 'ZP2026102702', pi: 'PI20261015BKN', cust: 'C-304', cur: 'USD', amt: 26320, got: 0, due: '11-06', log: [['11-18', 'LINE', '客户承诺月底前付']] },
+      { zp: 'ZP2026091803', pi: 'PI20260912KEP', cust: 'C-301', cur: 'USD', amt: 18600, got: 0, due: '10-08', log: [['11-10', '邮件', '客户付款流程卡在内部审批'], ['10-20', '邮件', '第一次提醒']] },
+      { zp: 'ZP2026080401', pi: 'PI20260728ALT', cust: 'C-302', cur: 'USD', amt: 22400, got: 12000, due: '09-03', log: [['10-30', 'WhatsApp', '已付 12,000，余款等对方银行放行']] },
+      { zp: 'ZP2026061102', pi: 'PI20260605MNO', cust: 'C-305', cur: 'USD', amt: 9800, got: 0, due: '07-11', log: [['09-02', 'WhatsApp', '客户称货有质量问题，要求扣款']] },
+      { zp: 'ZP2026042001', pi: 'PI20260416BKN', cust: 'C-304', cur: 'USD', amt: 7400, got: 0, due: '05-20', log: [] },
+      { zp: 'ZP2026111201', pi: 'PI20261103KEP', cust: 'C-301', cur: 'USD', amt: 28210, got: 0, due: '11-28', log: [] },
+      { zp: 'ZP2026110501', pi: 'PI20261021SGF', cust: 'C-303', cur: 'USD', amt: 24800, got: 24800, due: '11-10', log: [] }
+    ],
+    fx: {
+      locks: [['2026-11', 7.1432, '财务 · 赵敏', '11-01 09:12'], ['2026-10', 7.1186, '财务 · 赵敏', '10-01 09:05'], ['2026-09', 7.1120, '财务 · 赵敏', '09-01 09:20']],
+      daily: [['11-11', 7.1395], ['11-12', 7.1421], ['11-13', 7.1460], ['11-14', 7.1452], ['11-17', 7.1488], ['11-18', 7.1503]],
+      yzLast: '2025-01-02', yzRate: 7.1879,
+      hist: [['11-12', 24800, 7.1350, 'PI20261021SGF 全款'], ['10-31', 13140, 7.1290, 'PI20261028ALT 订金'], ['10-20', 11280, 7.1210, 'PI20261015BKN 订金']],
+      unsettled: 12090
+    },
+    approvals: [
+      { id: 'AP-412', type: '订单变更', ref: 'BG-0013', who: '陈一凡', detail: 'PI20261028ALT 改中性包装＋英文说明书', status: '待审批', step: '第 1 层 · 业务主管', go: 'contract|PI20261028ALT|change' },
+      { id: 'AP-411', type: '信用额度超限', ref: 'PI20261009MNO', who: '陈一凡', detail: '额度 USD 30,000，已有未收 USD 9,800，本单 USD 21,120', status: '待审批', step: '第 2 层 · 总经理', go: 'contract|PI20261009MNO' },
+      { id: 'AP-409', type: '报价毛利低于门槛', ref: 'BJ2026111702', who: '周可', detail: '毛利 9.4%，门槛 12%', status: '待审批', step: '第 1 层 · 业务主管', go: 'quote' }
+    ],
+    ships: [
+      { id: 'SH-2611-03', mode: '空运', route: '深圳 → 墨西哥城 MEX', etd: '11-24', items: [['PI20261028ALT', 'C91SP25SR-B1', 3000]], freight: 1860, ck: 'CK2026111702', docs: { 商业发票: 1, 装箱单: 1, 报关资料: 0, 空运提单: 0, 原产地声明: 0 }, st: '待订舱' },
+      { id: 'SH-2611-01', mode: '快递 DHL', route: '深圳 → 胡志明 SGN', etd: '11-05', items: [['PI20261021SGF', 'C91SPCW55-40', 4000]], freight: 620, ck: 'CK2026110402', docs: { 商业发票: 1, 装箱单: 1, 报关资料: 1, 运单: 1, 'Form E 产地证': 1 }, st: '已签收' },
+      { id: 'SH-2610-07', mode: '空运', route: '深圳 → 曼谷 BKK', etd: '10-30', items: [['PI20261015BKN', 'C91SP10LR-D1', 3000], ['PI20261015BKN', 'C91GPON-CP', 500]], freight: 980, ck: 'CK2026102902', docs: { 商业发票: 1, 装箱单: 1, 报关资料: 1, 空运提单: 1, 'RCEP 原产地证书': 1 }, st: '已到港' }
+    ],
+    after: [
+      { id: 'AS-0021', pi: 'PI20261015BKN', cust: 'C-304', prod: 'C91SP10LR-D1', qty: 12, kind: '返修', reason: 'DDM 读数异常（温度偏高 8°C）', step: 2, steps: ['登记', '客户寄回', '检测', '维修或换新', '寄回客户'] },
+      { id: 'AS-0019', pi: 'PI20260728ALT', cust: 'C-302', prod: 'C91SP25SR-B1', qty: 30, kind: '退货', reason: '客户交换机兼容性问题，改订 10G', step: 4, steps: ['登记', '退货证明', '进口报关', '入库检验', '退款或换货'] }
+    ],
+    rebates: [
+      { cd: '5316 2026 1100 0412', pi: 'PI20261021SGF', inv: '进项专票 2 张', match: '一致', amt: 19940, st: '可申报' },
+      { cd: '5316 2026 1000 0388', pi: 'PI20261015BKN', inv: '进项专票 3 张', match: '规格写法不一致', amt: 31230, st: '待更正' },
+      { cd: '—', pi: 'PI20261028ALT', inv: '已到票', match: '—', amt: 0, st: '未报关' }
+    ],
+    wos: [
+      { id: 'WO20261116007', xs: 'XS20261100071', item: '91QS100LR4-A2', qty: 200, done: 90, due: '11-22', st: '生产中' },
+      { id: 'WO20261116008', xs: 'XS20261100071', item: '91SP10LR-D1', qty: 1500, done: 0, due: '11-25', st: '待领料' },
+      { id: 'WO20261102015', xs: 'XS20261100064', item: '91SP25SR-B1', qty: 3000, done: 3000, due: '11-15', st: '已完工' },
+      { id: 'WO20261113055', xs: 'XS20261100052', item: '91SP25SR-B1', qty: 2000, done: 0, due: '11-30', st: '欠料：25G VCSEL' }
+    ],
+    wws: [{ id: 'WW20261116001', xs: 'XS20261100071', sup: '外协厂甲（PCBA 贴片）', item: 'PCBA-QS100', qty: 220, sent: 220, back: 0, due: '11-23' }],
+    stock: [['C91QS100LR4-A2', '100G QSFP28 LR4', '成品仓', 36, 0, 120], ['C91SP10LR-D1', '10G SFP+ LR', '成品仓', 820, 600, 2400], ['C91SP25SR-B1', '25G SFP28 SR', '成品仓', 3060, 3000, 900], ['C91SPCW55-40', '1.25G CWDM 40km', '成品仓', 1240, 0, 5200], ['C91GPON-CP', 'GPON OLT C+', '成品仓', 140, 0, 650]],
+    bom: { code: 'C91QS100LR4-A2', inner: '91QS100LR4-A2', parts: [['PCBA-QS100', 'PCBA 100G LR4', 1, 186.0, '委外贴片'], ['TOSA-LR4', '发射器件 TOSA LR4', 1, 238.0, '采购'], ['ROSA-LR4', '接收器件 ROSA LR4', 1, 142.0, '采购'], ['SHELL-QS28', 'QSFP28 外壳', 1, 12.5, '采购'], ['PULL-QS28', '拉环', 1, 1.2, '采购'], ['HS-QS28', '散热片', 2, 3.4, '采购']] },
+    batches: [['IMP-1117-02', '11-17 16:40', '订单变更', 'BG-0012 → XS20261100071 V002', '已汇入'], ['IMP-1109-01', '11-09 09:30', '订单', 'PI20261009MNO', '暂停：信用额度待审批'], ['IMP-1103-01', '11-03 10:12', '订单', 'PI20261103KEP → XS20261100071', '已汇入'], ['IMP-1028-03', '10-28 17:05', '客户', 'Altamira → N0051', '已汇入']]
+  };
+}
+let DB = seed();
+
+const NODES = {
+  外销: ['报价', 'PI 确认', '易助下单', '生产', '质检', '订舱', '出库', '报关', '提单', '收款', '结汇', '退税'],
+  内销: ['报价', '合同', '易助下单', '生产', '出库', '开票', '回款']
+};
+const YZN = { 外销: [2, 3, 4, 6], 内销: [2, 3, 4, 5] };   // 由易助读回的节点
+const custOf = id => DB.customers.find(c => c.id === id) || {};
+const prodOf = code => DB.products.find(p => p.code === code) || { name: code, inner: code };
+const scOf = pi => DB.contracts.find(c => c.pi === pi);
+const total = c => c.lines.reduce((a, l) => a + l[1] * l[2], 0);
+const pendingAp = () => DB.approvals.filter(a => a.status === '待审批').length;
+const arOpen = () => DB.ar.filter(r => r.amt - r.got > 0);
+const overdueAmt = () => arOpen().filter(r => daysPast(r.due) > 0).reduce((a, r) => a + r.amt - r.got, 0);
+const curLock = () => DB.fx.locks[0];
+
+/* ================= 图标 ================= */
+const IC = {
+  req: '<path d="M9 11l2 2 4-4"/><rect x="4" y="4" width="16" height="16" rx="3"/>',
+  dash: '<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
+  approvals: '<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',
+  customers: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.4 3.4-5.5 6.5-5.5s5.7 2.1 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 010 7M18.5 14.8c1.6.9 2.6 2.7 3 5.2"/>',
+  quote: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h2M12 12h2M8 16h2M12 16h2"/>',
+  contracts: '<path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+  follow: '<rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="10" rx="1.5"/><rect x="17" y="4" width="4" height="13" rx="1.5"/>',
+  samples: '<path d="M9 3h6M10 3v6l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V3"/><path d="M7.5 15h9"/>',
+  ship: '<path d="M2 16l20-6-7 11-3-5z"/><path d="M12 16l3-6"/>',
+  after: '<path d="M14.5 5.5l4 4-9 9H5.5v-4z"/><path d="M12.5 7.5l4 4"/>',
+  receipts: '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/>',
+  ar: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/>',
+  fx: '<path d="M4 8h13l-3-3M20 16H7l3 3"/>',
+  rebate: '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>',
+  profit: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  comm: '<path d="M3 17l5-5 4 4 8-8"/><path d="M14 8h6v6"/>',
+  trace: '<circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="12" r="2"/><path d="M6 7v10M8 5h3a5 5 0 015 5v0M8 19h3a5 5 0 005-5"/>',
+  prod: '<path d="M3 21V10l5 3V10l5 3V7l8 4v10z"/><path d="M7 17h2M12 17h2M17 17h2"/>',
+  yzlink: '<path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/>',
+  apprset: '<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
+  category: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 17.5h7M17.5 14v7"/>',
+  perm: '<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/>',
+  country: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.5 3.5 5.5 3.5 8.5s-1 6-3.5 8.5c-2.5-2.5-3.5-5.5-3.5-8.5s1-6 3.5-8.5z"/>',
+  window: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5"/>',
+  portal: '<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>',
+  check: '<path d="M5 12l5 5L20 7"/>', arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>', left: '<path d="M19 12H5M11 6l-6 6 6 6"/>',
+  copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"/>',
+  reset: '<path d="M4 12a8 8 0 108-8 8 8 0 00-6.3 3"/><path d="M4 4v4h4"/>', x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon: '<path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/>',
+  menu: '<path d="M4 7h16M4 12h16M4 17h16"/>', search: '<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',
+  clip: '<path d="M20 11.5l-8.2 8.2a5 5 0 01-7-7L13 4.5a3.5 3.5 0 015 5l-8.2 8.2a2 2 0 01-2.8-2.8L14.5 7.4"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>'
+};
+const ic = k => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${IC[k] || ''}</svg>`;
+
+const NAV = [
+  ['确认', [['req', '需求确认']]],
+  ['总览', [['dash', '工作台'], ['approvals', '审批中心']]],
+  ['销售', [['customers', '客户'], ['quote', '报价'], ['contracts', '合同（PI）'], ['follow', '跟单看板'], ['samples', '样品与借出'], ['ship', '出运与单证'], ['after', '售后与返修']]],
+  ['财务', [['receipts', '收款登记'], ['ar', '应收跟催'], ['fx', '汇率与结汇'], ['rebate', '出口退税'], ['profit', '单票利润'], ['comm', '业绩与提成']]],
+  ['易助联动', [['trace', '订单追溯'], ['prod', '生产与库存'], ['yzlink', '对接状态']]],
+  ['设置', [['apprset', '审批设置'], ['category', '业务分类'], ['perm', '权限'], ['country', '国家配置'], ['window', '单一窗口'], ['portal', '客户门户']]]
+];
+const TITLE = Object.fromEntries(NAV.flatMap(([g, it]) => it.map(([k, n]) => [k, [g, n]])));
+TITLE.contract = ['销售', '合同明细'];
+
+/* ================= 需求确认清单 ================= */
+// [编号, 名称, 建议, 谁, 情境, 操作, 结果, 说明, 演示, 是否 v0.5 新增]
+const REQ = [
+  ['销售', '从询价到收款的外贸主线', [
+    ['r-cust', '客户中心与公海私海', 'r1', '业务员', '新客户询价、日常跟进', '建档、记录跟进；一个画面看应收、逾期、已订未出', '客户资源归公司，业务离职一键移交', '比易助“客户查询中心”多了跟进与对话记录', 'customers|C-301', 0],
+    ['r-quote', '结构化报价与版本', 'r1', '业务员', '客户询价时', '输入成本、汇率、运费、佣金，保存为报价单并保留每一版', '毛利低于门槛自动送审；报价内容不再只存在 Excel 附件里', '目前报价多以 Excel 附件挂在易助报价单上', 'quote', 1],
+    ['r-pi', '以 PI 号管理合同', 'r1', '业务员', '客户确认报价后', '一键转成 PI 与合同，设好订金、尾款', 'PI 号与易助订单号（XS）互相对照，两边都查得到', '沿用贵司现有的 PI 编号习惯', 'contract|PI20261103KEP', 1],
+    ['r-change', '订单变更与版本对照', 'r1', '业务、跟单', '客户改数量、交期、包装', '开变更单，系统列出改了哪里', '审批后自动同步成易助订单变更单', '订单变更是日常高频操作', 'contract|PI20261103KEP|change', 1],
+    ['r-domestic', '内销订单', 'r1', '内销业务', '国内客户下单', '开内销合同，选发票类型', '与外销共用报价、跟单、收款', '同一套流程，只在单证与开票节点不同', 'contracts|内销', 0],
+    ['r-sample', '样品与借出', 'r1', '业务员', '寄样给客户测试', '登记寄样，系统同步易助借出单并提醒归还', '测试通过可一键转成正式 PI', '样品验证是光模块成交的关键一步', 'samples', 1],
+    ['r-follow', '跟单看板（含生产进度）', 'r1', '跟单', '每天追进度', '看板同时显示易助工单、委外贴片进度', '逾期自动标红，不靠电话追', '生产数据读自易助', 'follow', 0],
+    ['r-trace', '订单追溯', 'r1', '业务、老板', '客户问“我的货到哪了”', '从 PI 一路查到工单、出库、发票、收款', '不用分别打开多个系统', '易助已有订单树状查询，这里加上外贸与收款段', 'trace', 1],
+    ['r-ship', '出运与单证', 'r1', '单证员', '出货前', '生成商业发票、装箱单、报关资料，关联易助出库单', '资料只录一次，单证统一存档', '取代在出库单备注写 PI 号、用聊天软件传报关资料', 'ship', 0],
+    ['r-comp', '国别合规与产地证', 'r2', '单证员', '出货前', '系统建议用 Form E 还是 RCEP，检查目的国文件', '缺文件时出货前就拦下来', '东南亚各国要求变化快', 'ship|SH-2611-01', 0],
+    ['r-after', '售后与返修', 'r1', '售后、品质', '客户反映问题', '反查原 PI，登记返修或退货', '返修进度与原订单关联', '光模块常见 DDM、兼容性问题', 'after', 0],
+    ['r-profit', '单票利润', 'r1', '老板、财务', '每张 PI 结束后', '看预估与实际利润', '差异拆成汇差、成本、运费、退税', '易助有订单利润表，这里补上汇差与运费', 'profit', 0],
+    ['r-perf', '归属业务与业绩', 'r1', '老板、财务', '每月统计', '合同记录实际负责的业务，与录单人分开', '业绩、提成可以按人统计', '提成口径需贵司确认', 'comm', 1]
+  ]],
+  ['生产与库存', '生产留在易助，本系统只读', [
+    ['r-prod', '生产进度读回', 'r1', '业务、跟单', '客户问交期时', '在合同页直接看工单与委外进度', '不用再去问生产部', '易助工单已带订单号，可以直接对上', 'prod', 0],
+    ['r-stock', '库存与可齐套数量', 'r1', '业务员', '报价、接单时', '查成品可用量与可齐套数量', '接单前就知道能不能交', '读自易助，库存账以易助为准', 'prod', 0],
+    ['r-bom', '客户品号与 BOM 查看', 'ro', '业务员', '报价时', '看客户品号对应的内部品号与材料组成', 'C91 开头的客户品号自动对应内部 91 品号', '只读，不能修改 BOM', 'prod', 1]
+  ]],
+  ['财务', '本系统管外贸收款，正式核销在易助', [
+    ['r-recv', '原币收款登记与认领', 'r1', '财务', '每笔款到账', '按原币登记，认领到 PI 的对应期数', '付款人与买方不一致时提示', '外销收款以美元记录，不再全部折成人民币', 'receipts', 1],
+    ['r-ar', '应收跟催与账龄', 'r1', '财务、业务', '每周', '按 30／60／90／180 天看逾期，记录跟催', '逾期自动提醒负责业务', '目前账龄分段较粗', 'ar', 1],
+    ['r-fx', '汇率锁定与结汇', 'r1', '财务', '每月初、结汇时', '每月锁定一次记账汇率，结汇记录实际汇率与汇差', '汇率太久没更新会自动提醒', '易助每日汇率表需要人工维护', 'fx', 1],
+    ['r-rebate', '出口退税资料', 'r2', '财务', '每月申报前', '专票与报关单配对，导出申报资料', '规格写法不一致提前发现', '需要财务团队确认申报方式', 'rebate', 0],
+    ['r-yzar', '易助应收与核销读回', 'rm', '系统', '每 15 分钟', '读回易助销售发票与收款核销结果', '合同页直接看到收款进度', '应收账仍以易助为准', 'trace', 1]
+  ]],
+  ['系统与对接', '权限、审批与外部系统', [
+    ['r-appr', '审批设置', 'rm', '管理员', '设定每种单据谁审批', '默认送审＋审核两段，可加到多层', '与易助现有的多级审批习惯一致', '审批人、金额门槛都可调', 'apprset', 1],
+    ['r-cat', '业务分类整理', 'r1', '管理员', '上线前', '把易助“性质类型”的值拆成业务类型、用途、产品线、项目', '报表能按外销内销、样品量产分开统计', '需要贵司确认每个值的意思', 'category', 1],
+    ['r-perm', '团队权限', 'rm', '管理员', '新人入职、调岗', '按角色设定看得到什么、能做什么', '新账号默认看不到任何客户；成本、底价按角色隐藏', '避免新账号看到全部客户资料', 'perm', 0],
+    ['r-stat', '数据统计', 'r1', '老板、主管', '每天、每月', '看出运、毛利、应收、业绩', '可导出 Excel', '', 'dash', 0],
+    ['r-yz', '易助订单汇入', 'rm', '系统', '合同确认后', '按易助官方模板汇入订单，PI 号写入客户单号', '两边可以互相追查', '方案的必要功能', 'yzlink', 0],
+    ['r-wecom', '审批与企业微信通知', 'r1', '主管、全员', '有待审批或逾期时', '在审批中心或企业微信直接处理', '主管在手机上就能审批', '免装 App', 'approvals', 0],
+    ['r-im', 'WhatsApp、Zalo、LINE 对话归档', 'r2', '业务员', '与海外客户沟通', '对话自动归到客户名下', '业务离职时沟通记录不会流失', '需在境外部署节点', 'customers|C-302', 0],
+    ['r-country', '国家配置', 'r1', '管理员', '开拓新国家时', '设定语言、币种、日期格式、合规要求、单证模板', '加一个国家只改配置', '', 'country', 0],
+    ['r-window', '国际贸易单一窗口', 'r2', '单证员', '报关、申领产地证', '先导出符合格式的资料', '少打一次字', '需要单证团队反馈', 'window', 0],
+    ['r-portal', '客户与工厂门户', 'r2', '客户、外协厂', '查进度、下载单据', '用链接登录，只看自己的单', '减少来回问进度', '第一版稳定后再开放', 'portal', 0]
+  ]]
+];
+const REC = { r1: '建议一期', r2: '建议二期', ro: '可选', rm: '必要' };
+const CH = { yes: '要', later: '之后再说', no: '不要', talk: '待讨论' };
+const ALL = REQ.flatMap(g => g[2]);
+</script>
+<script>
+/* ================= 共用片段 ================= */
+const pill = (t, k) => `<span class="pill p-${k}">${t}</span>`;
+const mono = s => `<span class="m">${s}</span>`;
+const piBtn = pi => `<button type="button" class="btn sm" data-go="contract|${pi}">${pi}</button>`;
+const yzTag = '<span class="tag yz">易助</span>', ownTag = '<span class="tag own">本系统</span>';
+function table(head, rows, opt = {}) {
+  const n = opt.num || [];
+  return `<div class="tbl"><table><thead><tr>${head.map((h, i) => `<th class="${n.includes(i) ? 'n' : ''}">${h}</th>`).join('')}</tr></thead><tbody>${rows.map((r, ri) => `<tr ${opt.click ? `class="click ${opt.sel && opt.sel(ri) ? 'sel' : ''}" ${opt.click(ri)}` : ''}>${r.map((c, i) => `<td class="${n.includes(i) ? 'n' : ''}">${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+const head = (t, p, right = '') => `<div class="ph"><div><h1>${t}</h1><p>${p}</p></div>${right}</div>`;
+const yzBanner = what => `<div class="banner yz"><b>读自易助</b><span>${what}由易助只读同步，约每 15 分钟更新一次，只取已审核的单据。需要修改请在易助中操作。</span></div>`;
+function spark(arr, color) {
+  const w = 88, h = 32, max = Math.max(...arr), min = Math.min(...arr), r = max - min || 1;
+  const pts = arr.map((v, i) => [i / (arr.length - 1) * (w - 4) + 2, h - 4 - (v - min) / r * (h - 8)]);
+  const line = pts.map(p => p.map(n => n.toFixed(1)).join(',')).join(' '), last = pts[pts.length - 1];
+  return `<svg class="sp" viewBox="0 0 ${w} ${h}" aria-hidden="true"><polygon points="2,${h - 2} ${line} ${w - 2},${h - 2}" fill="${color}" opacity=".12"/><polyline points="${line}" fill="none" stroke="${color}" stroke-width="1.6"/><circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.5" fill="${color}"/></svg>`;
+}
+function scStatus(c) {
+  if (c.block) return pill('待审批', 'warn');
+  const n = NODES[c.type];
+  if (c.node >= n.length - 1) return pill('已完成', 'ok');
+  if (c.late) return pill(`${n[c.node]} · 逾期 ${c.late} 天`, 'bad');
+  return pill(n[c.node], 'run');
+}
+function stepper(c) {
+  const n = NODES[c.type], yz = YZN[c.type];
+  return `<div class="stepper">${n.map((x, i) => `<div class="st ${i < c.node ? 'done' : i === c.node ? 'now' : ''}"><span class="dot">${i < c.node ? ic('check') : ''}</span>${x}${yz.includes(i) ? '<span class="tag yz" style="margin-top:-2px">易助</span>' : ''}</div>`).join('')}</div>`;
+}
+const agingBucket = d => d <= 0 ? '未到期' : d <= 30 ? '1–30 天' : d <= 60 ? '31–60 天' : d <= 90 ? '61–90 天' : d <= 180 ? '91–180 天' : '180 天以上';
+const BUCKETS = [['未到期', 'var(--accent)'], ['1–30 天', 'var(--ok)'], ['31–60 天', 'var(--warn)'], ['61–90 天', '#D9822B'], ['91–180 天', 'var(--bad)'], ['180 天以上', '#8E1B13']];
+
+/* ================= 页面 ================= */
+const V = {};
+
+V.req = () => {
+  const c = ALL.filter(r => S.choice[r[0]]), n = k => ALL.filter(r => S.choice[r[0]] === k).length;
+  const pct = Math.round(c.length / ALL.length * 100), nNew = ALL.filter(r => r[9]).length;
+  return head('需求确认', `共 ${ALL.length} 项，其中 ${nNew} 项是看过易助实际用法后新增的（标“新增”）。逐项选“要”“之后再说”“不要”或“待讨论”，不确定的先点“看演示”。`,
+    `<div class="toolbar"><button class="btn" type="button" data-act="apply">${ic('check')}全部按我们的建议选</button><button class="btn" type="button" data-act="reset">${ic('reset')}清空选择</button></div>`) + `
+  <div class="card">
+    <h3>进度 <small>已确认 ${c.length} / ${ALL.length} 项</small></h3>
+    <div class="req-sum"><div><b>${n('yes')}</b><span>要</span></div><div><b>${n('later')}</b><span>之后再说</span></div><div><b>${n('no')}</b><span>不要</span></div><div><b>${n('talk')}</b><span>待讨论</span></div></div>
+    <div class="req-prog"><i style="width:${pct}%"></i></div>
+    <p class="note">标签说明：<span class="rec rm">必要</span> 系统要运作就一定要有；<span class="rec r1">建议一期</span> 第一版就做；<span class="rec r2">建议二期</span> 第一版稳定后再做；<span class="rec ro">可选</span> 看贵司需要；<span class="rec new">新增</span> 本版新增。</p>
+  </div>` +
+  REQ.map(([g, sub, items]) => `<section class="req-group"><h2>${g}<small>${sub}</small></h2><div class="req-list">${items.map(([id, name, rec, who, when, what, result, why, demo, isNew]) => `
+    <article class="req" data-c="${S.choice[id] || ''}">
+      <div class="hd"><b>${name}</b><span class="toolbar" style="gap:4px">${isNew ? '<span class="rec new">新增</span>' : ''}<span class="rec ${rec}">${REC[rec]}</span></span></div>
+      <dl class="scn"><dt>谁</dt><dd>${who}</dd><dt>情境</dt><dd>${when}</dd><dt>操作</dt><dd>${what}</dd><dt>结果</dt><dd>${result}</dd></dl>
+      ${why ? `<div class="why">${why}</div>` : ''}
+      <div class="choose" role="group" aria-label="${name}">${Object.entries(CH).map(([k, t]) => `<button type="button" data-req="${id}" data-v="${k}" aria-pressed="${S.choice[id] === k}">${t}</button>`).join('')}<button type="button" class="go" data-go="${demo}">看演示 ${ic('arrow')}</button></div>
+      <label class="fb" for="note-${id}">意见或补充说明<textarea id="note-${id}" data-note="${id}" rows="2" placeholder="例如：我们现在的做法是……／希望增加……">${esc(S.note[id] || '')}</textarea></label>
+    </article>`).join('')}</div></section>`).join('') + `
+  <section class="req-group"><h2>导出结果<small>复制后贴到微信或邮件发给我们</small></h2>
+    <div class="card export"><label class="fb" for="note-_all" style="margin-bottom:12px">其他意见（清单以外想补充的功能、现在使用上的不便等）<textarea id="note-_all" data-note="_all" rows="4" placeholder="例如：希望手机上能查库存；每月要手工合并报表……">${esc(S.note._all || '')}</textarea></label><textarea id="exportText" readonly aria-label="确认结果">${exportText()}</textarea>
+    <div class="toolbar" style="margin-top:10px"><button class="btn pri" type="button" data-act="copy">${ic('copy')}复制结果</button><span class="note" style="margin:0">选择会保存在这台电脑的浏览器里，关掉再开还在。</span></div></div>
+  </section>`;
+};
+
+V.dash = () => {
+  const lk = curLock(), od = overdueAmt();
+  const open = DB.contracts.filter(c => c.node < NODES[c.type].length - 1).length;
+  const months = [['6月', 186], ['7月', 214], ['8月', 198], ['9月', 241], ['10月', 263], ['11月', 228]];
+  const max = 300, cw = 520, chh = 170;
+  const bars = months.map(([m, v], i) => { const x = 46 + i * 78, hh = v / max * (chh - 30), y = chh - 10 - hh; return `<rect x="${x}" y="${y.toFixed(1)}" width="40" height="${hh.toFixed(1)}" rx="5" fill="var(--accent)" opacity="${i === months.length - 1 ? 1 : .32}"/><text x="${x + 20}" y="${chh + 6}" text-anchor="middle">${m}</text><text x="${x + 20}" y="${(y - 6).toFixed(1)}" text-anchor="middle" style="fill:var(--ink)">${v}</text>`; }).join('');
+  const grid = [0, 100, 200, 300].map(v => { const y = chh - 10 - v / max * (chh - 30); return `<line x1="34" x2="${cw}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--line)"/><text x="28" y="${(y + 4).toFixed(1)}" text-anchor="end">${v}</text>`; }).join('');
+  const todo = [
+    ...DB.approvals.filter(a => a.status === '待审批').map(a => [a.type, mono(a.ref), `<button class="btn sm" type="button" data-go="approvals">去审批</button>`]),
+    ...DB.receipts.filter(r => !r.claimed).map(r => [`到账待认领 USD ${fmt(r.amt)}`, mono(r.id), `<button class="btn sm" type="button" data-go="receipts|${r.id}">去认领</button>`]),
+    ...DB.samples.filter(s => s.st === '逾期未还').map(s => [`样品逾期未还 · ${custOf(s.cust).short}`, mono(s.id), `<button class="btn sm" type="button" data-go="samples">查看</button>`]),
+    ['易助每日汇率已很久未更新', mono('汇率'), `<button class="btn sm" type="button" data-go="fx">查看</button>`]
+  ];
+  return head('工作台', `早上好，林晓。今天是 11 月 18 日，有 ${todo.length} 件事要处理。`, `<button class="btn" type="button" data-act="toast" data-msg="已导出本月报表 Excel（演示）">导出报表</button>`) + `
+  <div class="grid g4">
+    <div class="card kpi"><div class="k">进行中合同</div><div class="row"><div><div class="v">${open}</div><div class="d">其中 1 张待审批</div></div>${spark([4, 5, 5, 6, 7, open], 'var(--accent)')}</div></div>
+    <div class="card kpi"><div class="k">本月出运（千美元）</div><div class="row"><div><div class="v">228</div><div class="d up">截至今天，比上月同期 +6%</div></div>${spark([186, 214, 198, 241, 263, 228], 'var(--accent)')}</div></div>
+    <div class="card kpi"><div class="k">逾期应收（原币）</div><div class="row"><div><div class="v">USD ${fmt(od / 1000, 1)}k</div><div class="d dn">${arOpen().filter(r => daysPast(r.due) > 0).length} 张发票逾期</div></div>${spark([38, 52, 61, 70, 68, od / 1000], 'var(--bad)')}</div></div>
+    <div class="card kpi"><div class="k">本月锁定汇率</div><div class="row"><div><div class="v">${lk[1].toFixed(4)}</div><div class="d">USD/CNY · ${lk[3].split(' ')[0]} 锁定</div></div>${spark(DB.fx.daily.map(d => d[1]), 'var(--yz)')}</div></div>
+  </div>
+  <div class="grid g32 mt">
+    <div class="card"><h3>出运金额趋势 <small>千美元</small></h3><svg class="chart" viewBox="0 0 ${cw} ${chh + 14}" role="img" aria-label="近六个月出运金额，十月最高为 263 千美元" style="width:100%;height:auto">${grid}${bars}</svg></div>
+    <div class="card"><h3>待办 <small>${todo.length} 项</small></h3>${table(['事项', '单号', ''], todo)}</div>
+  </div>
+  <div class="card mt"><h3>生产与出货 ${yzTag} <small>工单数据读自易助</small></h3>${table(['PI', '客户', '当前节点', '易助订单', '工单进度', '预计出货'], DB.contracts.filter(c => c.type === '外销' && c.node < 9).map(c => {
+    const w = DB.wos.filter(x => c.wo.includes(x.id)), d = w.reduce((a, x) => a + x.done, 0), q = w.reduce((a, x) => a + x.qty, 0);
+    return [piBtn(c.pi), custOf(c.cust).short, scStatus(c), c.xs ? mono(c.xs) : '—', q ? `${fmt(d)} / ${fmt(q)}` : '—', c.pi === 'PI20261028ALT' ? '11-24' : c.pi === 'PI20261103KEP' ? '11-28' : '待定'];
+  }))}</div>`;
+};
+
+V.approvals = () => head('审批中心', '报价、合同、订单变更、收款异常都在这里处理，也会推送到企业微信') + `
+  <div class="grid g32">
+    <div class="card"><h3>审批事项 <small>${pendingAp()} 项待处理</small></h3>${table(['单号', '类型', '关联', '说明', '申请人', '进度', ''], DB.approvals.map(a => [mono(a.id), a.type, `<button class="btn sm" type="button" data-go="${a.go}">${a.ref}</button>`, `<span class="wrap">${a.detail}</span>`, a.who,
+      a.status === '待审批' ? pill(a.step, 'warn') : a.status === '已核准' ? pill('已核准', 'ok') : pill('已退回', 'mute'),
+      a.status === '待审批' ? `<div class="toolbar"><button class="btn sm pri" type="button" data-act="approve" data-id="${a.id}">核准</button><button class="btn sm dng" type="button" data-act="reject" data-id="${a.id}">退回</button></div>` : '']))}
+    <p class="note">审批层级与门槛在 <button class="btn sm" type="button" data-go="apprset">审批设置</button> 调整。默认“送审＋审核”两段，与易助现在的用法一致。</p></div>
+    <div class="card"><h3>企业微信推送预览</h3><div class="phone">
+      <div class="pc"><h5>光数外贸 · 待审批</h5>${DB.approvals.filter(a => a.status === '待审批').slice(0, 2).map(a => `<div style="border-top:1px solid var(--line);padding-top:6px;margin-top:6px"><b>${a.type}</b><br><span style="color:var(--muted)">${a.ref} · ${a.detail}</span></div>`).join('') || '<span style="color:var(--muted)">目前没有待审批</span>'}<div class="toolbar" style="margin-top:10px"><span class="btn sm pri">打开处理</span></div></div>
+    </div></div>
+  </div>`;
+
+V.customers = () => {
+  const list = DB.customers.filter(c => S.custF === '全部' || c.pool === S.custF || c.type === S.custF);
+  return head('客户', '公海与私海 · 30 天没跟进自动回公海 · 点一行打开客户中心', `<button class="btn pri" type="button" data-act="toast" data-msg="已新增客户，审核后同步到易助客户档（演示）">${ic('plus')}新增客户</button>`) + `
+  <div class="toolbar" style="margin-bottom:12px"><div class="filters">${['全部', '私海', '公海', '外销', '内销'].map(f => `<button type="button" data-act="custF" data-id="${f}" aria-pressed="${S.custF === f}">${f}</button>`).join('')}</div></div>` +
+    table(['客户', '国家', '币种', '等级', '归属业务', '易助编号', '未收（原币）', '沟通', '最近跟进', ''], list.map(c => {
+      const due = arOpen().filter(r => r.cust === c.id).reduce((a, r) => a + r.amt - r.got, 0);
+      return [`<b>${c.name}</b>`, c.country, c.cur, c.level, c.sales, c.yz === '—' ? '<span class="note" style="margin:0">未建档</span>' : mono(c.yz), due ? `${c.cur} ${fmt(due)}` : '—', c.ch, c.last,
+        c.pool === '公海' ? `<button class="btn sm" type="button" data-act="claimCust" data-id="${c.id}">领取</button>` : pill('私海', 'run')];
+    }), { num: [6], click: i => `data-act="openCust" data-id="${list[i].id}"` }) +
+    `<p class="note">新客户在本系统建立，审核后同步到易助客户档，易助编号自动回填。</p>`;
+};
+function custDrawer(id) {
+  const c = custOf(id), scs = DB.contracts.filter(x => x.cust === id);
+  const ar = arOpen().filter(r => r.cust === id), due = ar.reduce((a, r) => a + r.amt - r.got, 0), od = ar.filter(r => daysPast(r.due) > 0).reduce((a, r) => a + r.amt - r.got, 0);
+  const ordered = scs.filter(x => x.node < 6).reduce((a, x) => a + total(x), 0), shipped = scs.filter(x => x.node >= 6 && x.node < 9).reduce((a, x) => a + total(x), 0);
+  const used = due + ordered;
+  return `<div class="dh"><div><h2>${c.name}</h2><p class="note" style="margin:3px 0 0">${c.country} · ${c.level} 级 · 归属 ${c.sales} · 易助 ${c.yz}</p></div><button class="x" type="button" data-act="close" aria-label="关闭">${ic('x')}</button></div>
+  <div class="mini">
+    <div><span>未收应收</span><b>${c.cur} ${fmt(due)}</b></div>
+    <div><span>其中逾期</span><b class="${od ? 'dn' : ''}">${c.cur} ${fmt(od)}</b></div>
+    <div><span>已订未出</span><b>${c.cur} ${fmt(ordered)}</b></div>
+    <div><span>已出未收</span><b>${c.cur} ${fmt(shipped)}</b></div>
+    <div><span>信用额度</span><b>${c.cur} ${fmt(c.credit)}</b></div>
+    <div><span>额度已用</span><b class="${used > c.credit ? 'dn' : ''}">${Math.round(used / c.credit * 100)}%</b></div>
+  </div>
+  <div class="kv sep"><div><span>联系人</span>${c.contact}</div><div><span>沟通渠道</span>${c.ch}</div><div><span>付款条件</span>${c.terms}</div><div><span>业务类型</span>${c.type}</div></div>
+  <h3>合同</h3>${scs.length ? table(['PI', '金额', '状态'], scs.map(x => [piBtn(x.pi), `${x.cur} ${fmt(total(x), 2)}`, scStatus(x)]), { num: [1] }) : '<p class="note">还没有合同。</p>'}
+  ${ar.length ? `<h3>未收发票 ${yzTag}</h3>${table(['发票', '到期', '未收', '账龄'], ar.map(r => [mono(r.zp), r.due, `${r.cur} ${fmt(r.amt - r.got)}`, daysPast(r.due) > 0 ? pill(`逾期 ${daysPast(r.due)} 天`, 'bad') : pill('未到期', 'mute')]), { num: [2] })}` : ''}
+  <h3>跟进记录</h3><div class="timeline">${c.follow.map(f => `<div><span class="t">${f[0]}</span><span class="d"></span><span><b>${f[1]}</b> · ${f[2]}</span></div>`).join('')}</div>
+  <h3>${c.ch} 对话归档 <span class="tag own">自动归档</span></h3><div class="chat">${c.chat.map(m => `<div class="bubble ${m[0] === '我' ? 'me' : ''}"><small>${m[0] === '我' ? c.sales : c.contact.split('（')[0]} · ${m[1]}</small>${esc(m[2])}</div>`).join('')}</div>
+  <div class="toolbar" style="margin-top:18px"><button class="btn pri" type="button" data-act="toast" data-msg="已新增跟进记录（演示）">新增跟进</button><button class="btn" type="button" data-act="toast" data-msg="已移交给陈一凡（演示）">移交给其他业务</button></div>`;
+}
+
+V.quote = () => {
+  const q = S.q, p = prodOf(q.prod), cu = custOf(q.cust);
+  const rebate = q.cost / 1.13 * q.rebate / 100, unit = q.cost - rebate + q.extra;
+  const price = unit / q.fx / (1 - q.margin / 100) / (1 - q.comm / 100) + q.freight;
+  const profit = (price - q.freight) * q.fx * (1 - q.comm / 100) - unit, rate = profit / ((price - q.freight) * q.fx) * 100, low = rate < 12;
+  S.calc = { price, rate };
+  const f = (k, lab, step) => `<label for="q-${k}">${lab}<input id="q-${k}" type="number" step="${step}" value="${q[k]}" data-q="${k}"></label>`;
+  const vers = DB.quoteVers.BJ2026110301;
+  return head('报价', '试算后保存为报价单，每次改价都留一版；毛利低于 12% 自动送审，核准后可一键转 PI') + `
+  <div class="grid g2">
+    <div class="card"><h3>成本与条件</h3><div class="form">
+      <label for="q-cust">客户<select id="q-cust" data-qs="cust">${DB.customers.filter(c => c.type === '外销').map(c => `<option value="${c.id}" ${c.id === q.cust ? 'selected' : ''}>${c.name}</option>`).join('')}</select></label>
+      <label for="q-prod">产品（客户品号）<select id="q-prod" data-qs="prod">${DB.products.map(x => `<option value="${x.code}" ${x.code === q.prod ? 'selected' : ''}>${x.code} · ${x.name}</option>`).join('')}</select></label>
+      ${f('cost', '含税成本（元／只）', 1)}${f('rebate', '出口退税率（%）', 1)}
+      ${f('fx', '报价汇率（USD/CNY）', 0.0001)}${f('extra', '包装与杂费（元／只）', 0.5)}
+      ${f('freight', '运费分摊（USD／只）', 0.05)}${f('qty', '数量（只）', 10)}
+      ${f('comm', '佣金（%）', 0.5)}${f('margin', '目标利润率（%）', 0.5)}
+    </div><p class="note">内部品号 ${mono(p.inner)} · 海关编码 ${mono(p.hs)}。成本参考易助“商品平均成本”（月加权平均），汇率默认带入本月锁定汇率 ${curLock()[1].toFixed(4)}。</p></div>
+    <div class="card"><h3>报价结果 <small>${cu.short}</small></h3><div class="res">
+      <div><span>退税（元／只）</span><span class="m">${fmt(rebate, 2)}</span></div>
+      <div><span>实际成本（元／只）</span><span class="m">${fmt(unit, 2)}</span></div>
+      <div><span>每只利润（元）</span><span class="m">${fmt(profit, 2)}</span></div>
+      <div><span>毛利率</span><span>${low ? pill(fmt(rate, 1) + '%，低于 12% 需审批', 'warn') : pill(fmt(rate, 1) + '%', 'ok')}</span></div>
+      <div><span>合计（${fmt(q.qty)} 只）</span><span class="m">USD ${fmt(price * q.qty, 2)}</span></div>
+      <div class="big"><span>报价（USD／只）</span><span class="m">${fmt(price, 2)}</span></div>
+    </div>
+    <div class="toolbar" style="margin-top:14px"><button class="btn pri" type="button" data-act="saveQuote">${low ? '保存并送审批' : '保存报价单'}</button><button class="btn" type="button" data-act="toast" data-msg="已生成英文报价单 PDF（演示）">英文报价单</button><button class="btn" type="button" data-act="toast" data-msg="已附加规格书 PDF（演示）">${ic('clip')}附件</button></div></div>
+  </div>
+  <div class="card mt"><h3>报价单 <small>编号沿用易助 BJ 规则</small></h3>${table(['报价单', '版本', '客户', '产品', '数量', '单价 USD', '毛利率', '附件', '状态', ''], DB.quotes.map(x => [mono(x.id), 'V' + x.ver, custOf(x.cust).short, prodOf(x.prod).name, fmt(x.qty), fmt(x.price, 2), fmt(x.margin, 1) + '%', x.att,
+    x.status === '待审批' ? pill('待审批', 'warn') : x.status === '已批准' ? pill('已批准', 'ok') : x.status === '已退回' ? pill('已退回', 'mute') : x.status === '已发客户' ? pill('已发客户', 'yz') : pill('已转合同', 'run'),
+    x.status === '已批准' || x.status === '已发客户' ? `<button class="btn sm pri" type="button" data-act="toContract" data-id="${x.id}">转 PI</button>` : x.pi ? piBtn(x.pi) : x.status === '待审批' ? `<button class="btn sm" type="button" data-go="approvals">去审批</button>` : '']), { num: [4, 5, 6, 7] })}</div>
+  <div class="grid g2 mt">
+    <div class="card"><h3>版本记录 <small>BJ2026110301 · Kepler</small></h3>${table(['版本', '日期', '单价', '说明'], vers.map(v => [v[0], v[1], v[2], `<span class="wrap">${v[3]}</span>`]))}<p class="note">每一版都保留，客户问“上次报多少”时一查就有。</p></div>
+    <div class="card"><h3>易助中的历史报价 ${yzTag}</h3>${table(['易助报价单', '日期', '附件'], [[mono('BJ2026103002'), '2026-10-30', 'PI_100G_LR4_v2.xlsx'], [mono('BJ2026102201'), '2026-10-22', 'Quotation_25G_SR.xlsx'], [mono('BJ2026101503'), '2026-10-15', 'PI_GPON_C+.xlsx']])}<p class="note">易助里的报价目前多以 Excel 附件保存（数量很多）。上线时可以把附件清单导入，按客户、产品查得到，新报价则改用结构化录入。</p></div>
+  </div>`;
+};
+
+V.contracts = () => {
+  const list = DB.contracts.filter(c => S.scF === '全部' || c.type === S.scF || (S.scF === '待收款' && c.pay.some(p => p[3] !== '已收')));
+  return head('合同（PI）', '以客户 PI 号为主，易助订单号（XS）为对照；外销与内销共用同一套流程', `<button class="btn pri" type="button" data-go="quote">${ic('plus')}新建合同</button>`) + `
+  <div class="toolbar" style="margin-bottom:12px"><div class="filters">${['全部', '外销', '内销', '待收款'].map(f => `<button type="button" data-act="scF" data-id="${f}" aria-pressed="${S.scF === f}">${f}</button>`).join('')}</div></div>` +
+    table(['PI／合同号', '易助订单', '客户', '归属业务', '贸易条件', '金额', '当前节点', '版本', ''], list.map(c => [`<b class="m">${c.pi}</b>`, c.xs ? mono(c.xs) : '<span class="note" style="margin:0">未下单</span>', custOf(c.cust).short, c.sales, c.term, `${c.cur} ${fmt(total(c), 2)}`, scStatus(c), 'V' + String(c.ver).padStart(3, '0'), `<button class="btn sm" type="button" data-go="contract|${c.pi}">打开</button>`]), { num: [5] }) +
+    `<p class="note">PI 号由本系统产生，汇入易助时写进订单的“客户单号”，合同号写进自定义栏，两边都能互相查到。</p>`;
+};
+
+V.contract = () => {
+  const c = scOf(S.arg) || DB.contracts[0], cu = custOf(c.cust);
+  const paid = c.pay.filter(p => p[3] === '已收').reduce((a, p) => a + p[1], 0);
+  const ships = DB.ships.filter(s => s.items.some(i => i[0] === c.pi));
+  const chg = DB.changes.filter(x => x.pi === c.pi);
+  const tabs = [['lines', '明细'], ['pay', '款项'], ['change', `变更${chg.length ? ' ' + chg.length : ''}`], ['ship', '出运与单证'], ['trace', '追溯'], ['profit', '利润']];
+  if (!tabs.some(t => t[0] === S.tab)) S.tab = 'lines';
+  const T = {
+    lines: () => table(['客户品号', '内部品号', '品名', '海关编码', '数量', '单价', '金额'], c.lines.map(l => [mono(l[0]), mono(prodOf(l[0]).inner), prodOf(l[0]).name, mono(prodOf(l[0]).hs), fmt(l[1]), fmt(l[2], 2), fmt(l[1] * l[2], 2)]), { num: [4, 5, 6] }) + `<p class="note">客户品号（C91 开头）汇入易助时自动对应内部生产品号（91 开头），生产仍按内部品号排单。</p>`,
+    pay: () => table(['款项', '金额', '到期日', '状态', ''], c.pay.map(p => [p[0], `${c.cur} ${fmt(p[1], 2)}`, p[2], p[3] === '已收' ? pill('已收', 'ok') : p[3] === '逾期' ? pill(`逾期 ${daysPast(p[2])} 天`, 'bad') : p[3] === '到账待认领' ? pill('到账待认领', 'yz') : pill(p[3], 'mute'), p[3] !== '已收' && c.cur === 'USD' ? `<button class="btn sm" type="button" data-go="receipts">去认领</button>` : '']), { num: [1] }) + `<p class="note">已收 ${c.cur} ${fmt(paid, 2)}，未收 ${c.cur} ${fmt(total(c) - paid, 2)}。收款按原币记录；易助的销售发票与收款核销结果会自动读回。</p>`,
+    change: () => chg.length ? chg.map(x => `<div class="card" style="margin-bottom:12px;background:var(--card2)"><h3>${x.id} · V${x.ver} <small>${x.date} · ${x.by} · ${x.reason}</small>${x.st === '待审批' ? pill('待审批', 'warn') : pill(x.st, 'ok')}</h3>${table(['项目', '原内容', '变更后'], x.diff.map(d => [d[0], `<span style="text-decoration:line-through;color:var(--faint)">${d[1]}</span>`, `<b>${d[2]}</b>`]))}</div>`).join('') + `<div class="toolbar"><button class="btn pri" type="button" data-act="toast" data-msg="已建立变更单 V${String(c.ver + 1).padStart(3, '0')}（演示）">${ic('plus')}新增变更</button></div><p class="note">审批通过后自动生成易助“订单变更单”，版本号与本系统一致。</p>` : `<p class="note">这张合同还没有变更。</p><div class="toolbar"><button class="btn pri" type="button" data-act="toast" data-msg="已建立变更单 V002（演示）">${ic('plus')}新增变更</button></div>`,
+    ship: () => ships.length ? table(['出运', '方式', '路线', '本合同数量', '易助出库单', '单证', '状态'], ships.map(s => [`<button class="btn sm" type="button" data-go="ship|${s.id}">${s.id}</button>`, s.mode, s.route, fmt(s.items.filter(i => i[0] === c.pi).reduce((a, i) => a + i[2], 0)), mono(s.ck), `${Object.values(s.docs).filter(Boolean).length}/5`, pill(s.st, s.st === '待订舱' ? 'run' : 'ok')])) : '<p class="note">还没有出运计划。</p>',
+    trace: () => traceTree(c),
+    profit: () => `<div class="kv"><div><span>预估利润</span>¥${fmt(c.est)}</div><div><span>实际利润</span>${c.act == null ? '未结案' : '¥' + fmt(c.act)}</div><div><span>合同金额</span>${c.cur} ${fmt(total(c), 2)}</div><div><span>产地证</span>${c.co}</div></div>${c.act != null ? `<p class="note">实际比预估少 ¥${fmt(c.est - c.act)}，主要是汇差：报价按 7.1432，结汇 7.1350。<button class="btn sm" type="button" data-go="profit">看差异拆解</button></p>` : ''}`
+  };
+  return `<button class="back" type="button" data-go="contracts">${ic('left')}返回合同列表</button>` + `
+  <div class="card">
+    ${c.block ? `<div class="banner warn"><b>暂停</b><span>${c.block}。<button class="btn sm" type="button" data-go="approvals">去审批</button></span></div>` : ''}
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:baseline">
+      <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span class="m" style="font-size:21px;font-weight:650">${c.pi}</span><button class="btn sm" type="button" data-act="openCust" data-id="${cu.id}">${cu.name}</button>${c.xs ? `<span class="tag yz">易助 ${c.xs}</span>` : ''}${scStatus(c)}</div>
+      <div><span style="font-family:var(--font-d);font-size:21px;font-weight:700">${c.cur} ${fmt(total(c), 2)}</span> <span class="note" style="margin:0">${c.term}</span></div>
+    </div>
+    ${stepper(c)}
+    <div class="kv sep">
+      <div><span>付款条件</span>${c.pay.map(p => p[0]).join('，')}</div>
+      <div><span>归属业务</span>${c.sales}</div>
+      <div><span>业务类型 · 用途</span>${c.type} · ${c.use}</div>
+      <div><span>当前版本</span>V${String(c.ver).padStart(3, '0')}</div>
+    </div>
+    <div class="toolbar" style="margin-top:14px"><button class="btn pri" type="button" data-act="advance" data-id="${c.pi}" ${c.block || c.node >= NODES[c.type].length - 1 ? 'disabled' : ''}>完成「${NODES[c.type][c.node]}」，进入下一步</button><button class="btn" type="button" data-act="toast" data-msg="已发送更新后的 PI 给客户（演示）">发 PI 给客户</button></div>
+  </div>
+  <div class="card mt"><div class="tabs" role="tablist">${tabs.map(([k, n]) => `<button type="button" role="tab" aria-selected="${S.tab === k}" data-act="tab" data-id="${k}">${n}</button>`).join('')}</div>${T[S.tab]()}</div>`;
+};
+
+/* 订单追溯树：外贸段在本系统，生产到核销读自易助 */
+function traceTree(c) {
+  const cu = custOf(c.cust), wos = DB.wos.filter(w => c.wo.includes(w.id)), wws = DB.wws.filter(w => w.xs && w.xs === c.xs);
+  const recv = c.pay.filter(p => p[3] === '已收').reduce((a, p) => a + p[1], 0);
+  const node = (st, t, sub, ref, src, cls = '') => `<div class="tn ${cls}"><span class="dot ${st}"></span><span class="lbl"><b>${t} ${src}</b><span>${sub}</span></span><span class="m" style="color:var(--muted)">${ref}</span></div>`;
+  const q = DB.quotes.find(x => x.pi === c.pi);
+  return `<div class="trace">
+    ${node('d', '报价', q ? `V${q.ver} · 毛利 ${q.margin}%` : '直接下单', q ? q.id : '—', ownTag)}
+    ${node('d', 'PI 确认', `${cu.short} · ${c.cur} ${fmt(total(c), 2)}`, c.pi, ownTag)}
+    ${node(c.xs ? 'd' : c.block ? 'a' : 'w', '易助订单', c.xs ? `V${String(c.ver).padStart(3, '0')} 已同步` : c.block ? '等待信用额度审批' : '未下单', c.xs || '—', yzTag)}
+    ${wos.map(w => node(w.st === '已完工' ? 'd' : w.done > 0 || w.st.startsWith('生产') ? 'a' : 'w', '工单', `${w.item} · ${fmt(w.done)} / ${fmt(w.qty)} · ${w.st}`, w.id, yzTag, 'sub')).join('')}
+    ${wws.map(w => node('a', '委外贴片', `${w.sup} · 已送料 ${w.sent} 套 · 预计 ${w.due} 回货`, w.id, yzTag, 'sub')).join('')}
+    ${node(c.ck ? 'd' : 'w', '出库', c.ck ? '已出库' : '未出库', c.ck || '—', yzTag)}
+    ${node(c.xh ? 'd' : 'w', '销货与发票', c.zp ? `发票 ${c.zp}` : '未开票', c.xh || '—', yzTag)}
+    ${node(recv >= total(c) ? 'd' : recv > 0 ? 'a' : 'w', '收款（原币）', `${c.cur} ${fmt(recv, 2)} / ${fmt(total(c), 2)}`, c.pay.some(p => p[3] === '到账待认领') ? '有到账待认领' : '', ownTag)}
+  </div><p class="note">“易助”标记的节点由易助只读同步：工单的前置单号就是易助订单号，所以能自动对上这张 PI。</p>`;
+}
+</script>
+<script>
+V.follow = () => {
+  const cols = [[2, '易助下单', 1], [3, '生产', 1], [4, '质检', 1], [5, '订舱', 0], [6, '出库', 1], [9, '收款', 0]];
+  const list = DB.contracts.filter(c => c.type === '外销');
+  return head('跟单看板', '每张外销 PI 按节点推进 · 红框为逾期 · 标“易助”的栏位进度自动读回') +
+    `<div class="kanban">${cols.map(([n, name, yz]) => { const cs = list.filter(c => c.node === n); return `<div class="col"><h4><span>${name}${yz ? '<span class="tag yz">易助</span>' : ''}</span><span>${cs.length}</span></h4>${cs.map(c => {
+      const w = DB.wos.filter(x => c.wo.includes(x.id)), d = w.reduce((a, x) => a + x.done, 0), q = w.reduce((a, x) => a + x.qty, 0);
+      return `<div class="kc ${c.late ? 'late' : ''}"><div class="t">${c.pi}</div><div class="s">${custOf(c.cust).short} · ${c.cur} ${fmt(total(c))}</div><div class="s">${c.lines.map(l => prodOf(l[0]).name).join('、')}</div>${q ? `<div class="s">工单 ${fmt(d)} / ${fmt(q)}</div>` : ''}<div class="f">${c.late ? `<span class="dn">逾期 ${c.late} 天</span>` : c.block ? '<span class="dn">待审批</span>' : '<span class="s">正常</span>'}<button class="btn sm" type="button" data-go="contract|${c.pi}">打开</button></div></div>`;
+    }).join('') || '<p class="note" style="margin:4px">没有合同</p>'}</div>`; }).join('')}</div>
+    <p class="note">生产、质检、出库的进度来自易助工单与出库单；订舱、收款由跟单与财务在本系统更新。</p>`;
+};
+
+V.samples = () => {
+  const list = DB.samples.filter(s => S.sampleF === '全部' || s.st === S.sampleF);
+  const k = st => DB.samples.filter(s => s.st === st).length;
+  return head('样品与借出', '寄样登记后同步为易助借出单，到期提醒归还；测试通过可直接转 PI', `<button class="btn pri" type="button" data-act="toast" data-msg="已登记寄样，等待主管审批后同步易助借出单（演示）">${ic('plus')}登记寄样</button>`) + `
+  <div class="grid g4">
+    <div class="card kpi"><div class="k">测试中</div><div class="v">${k('测试中')}</div></div>
+    <div class="card kpi"><div class="k">逾期未还</div><div class="v dn">${k('逾期未还')}</div></div>
+    <div class="card kpi"><div class="k">待借出</div><div class="v">${k('待借出')}</div></div>
+    <div class="card kpi"><div class="k">近 90 天样品转订单率</div><div class="v">38%</div><div class="d">8 次寄样中 3 次成单</div></div>
+  </div>
+  <div class="toolbar mt" style="margin-bottom:12px"><div class="filters">${['全部', '测试中', '逾期未还', '待借出', '已转订单'].map(f => `<button type="button" data-act="sampleF" data-id="${f}" aria-pressed="${S.sampleF === f}">${f}</button>`).join('')}</div></div>` +
+  table(['寄样单', '客户', '产品', '数量', '寄出', '应还', '易助借出单', '状态', '说明', ''], list.map(s => [mono(s.id), custOf(s.cust).short, prodOf(s.prod).name, s.qty, s.out, s.due, s.jc ? mono(s.jc) : '—',
+    s.st === '逾期未还' ? pill(`逾期 ${daysPast(s.due)} 天`, 'bad') : s.st === '已转订单' ? pill('已转订单', 'ok') : s.st === '待借出' ? pill('待借出', 'mute') : pill('测试中', 'run'), `<span class="wrap">${s.note}</span>`,
+    s.st === '测试中' ? `<button class="btn sm pri" type="button" data-act="sampleWin" data-id="${s.id}">测试通过，转 PI</button>` : s.st === '逾期未还' ? `<button class="btn sm" type="button" data-act="toast" data-msg="已通过 ${custOf(s.cust).ch} 提醒客户归还（演示）">提醒归还</button>` : s.pi ? piBtn(s.pi) : '']), { num: [3] }) +
+  `<p class="note">样品不计价（价税合计为 0），但成本会记到“样品费用”。客户决定买下时，可直接把借出转成销货，不用先还再卖。</p>`;
+};
+
+V.ship = () => {
+  const s = DB.ships.find(x => x.id === S.shipSel) || DB.ships[0];
+  const w = s.items.map(i => i[2] * prodOf(i[1]).kg), tw = w.reduce((a, b) => a + b, 0);
+  const cc = custOf((scOf(s.items[0][0]) || {}).cust).cc;
+  const comp = { VN: [['产地证', 'Form E（中国—东盟），越南进口光模块税率 0%', 1], ['越文标签', '已在装箱单附越文品名', 1]], TH: [['产地证', 'RCEP 原产地证书', 1], ['NBTC', '光模块非无线设备，不需认证（已确认）', 1]], MX: [['西班牙语品名', '商业发票已附西语品名', 1], ['原产地声明', '一般贸易，附原产地声明即可', 0], ['进口商 RFC', '客户税号已登记', 1]] }[cc] || [];
+  const nDoc = Object.values(s.docs).filter(Boolean).length;
+  return head('出运与单证', '订舱、单证与合规检查集中在这里，关联易助出库单') + `
+  <div class="banner own"><b>取代现在的做法</b><span>出库单备注手写 PI 号、用聊天软件传报关资料，改成在这里生成并存档，每份单证都连到 PI 与易助出库单。</span></div>` +
+  table(['出运', '方式', '路线', '出发', 'PI', '易助出库单', '单证', '状态'], DB.ships.map(x => [mono(x.id), x.mode, x.route, x.etd, [...new Set(x.items.map(i => i[0]))].join('、'), mono(x.ck), `${Object.values(x.docs).filter(Boolean).length}/5`, pill(x.st, x.st === '待订舱' ? 'run' : 'ok')]), { click: i => `data-act="shipSel" data-id="${DB.ships[i].id}"`, sel: i => DB.ships[i].id === s.id }) + `
+  <div class="grid g2 mt">
+    <div class="card"><h3>${s.id} 货物与运费 <small>${s.mode} · 毛重约 ${fmt(tw, 1)} kg</small></h3>` + table(['PI', '品项', '数量', '重量 kg', '分摊运费 USD'], [...s.items.map((i, k) => [piBtn(i[0]), prodOf(i[1]).name, fmt(i[2]), fmt(w[k], 1), fmt(s.freight * w[k] / tw, 2)]), ['<b>合计</b>', '', '', `<b>${fmt(tw, 1)}</b>`, `<b>${fmt(s.freight, 2)}</b>`]], { num: [2, 3, 4] }) + `<p class="note">运费按重量分摊回每张 PI，单票利润才算得准。</p></div>
+    <div class="card"><h3>单证 <small>${nDoc}/5 已生成</small></h3>${table(['单证', '状态'], Object.entries(s.docs).map(([k, v]) => [k, v ? pill('已生成', 'ok') : pill('未生成', 'mute')]))}
+      <div class="toolbar" style="margin-top:12px"><button class="btn pri" type="button" data-act="genDocs" data-id="${s.id}" ${nDoc === 5 ? 'disabled' : ''}>一键生成单证</button><button class="btn" type="button" data-go="window">导出单一窗口资料</button></div></div>
+  </div>
+  <div class="card mt"><h3>国别合规 <small>${{ VN: '越南', TH: '泰国', MX: '墨西哥' }[cc] || ''}</small></h3>${table(['检查项', '说明', '结果'], comp.map(r => [r[0], `<span class="wrap">${r[1]}</span>`, r[2] ? pill('通过', 'ok') : pill('待补', 'warn')]))}</div>`;
+};
+
+V.after = () => head('售后与返修', '客户反映问题时反查原 PI，返修与退货进度一目了然', `<button class="btn pri" type="button" data-act="toast" data-msg="已登记售后单（演示）">${ic('plus')}登记售后</button>`) +
+  table(['售后单', '原 PI', '客户', '产品', '数量', '类型', '原因', '进度', ''], DB.after.map(a => [mono(a.id), mono(a.pi), custOf(a.cust).short, prodOf(a.prod).name, a.qty, a.kind === '退货' ? pill('退货', 'warn') : pill('返修', 'run'), `<span class="wrap">${a.reason}</span>`, `${a.steps[a.step]}（${a.step + 1}/${a.steps.length}）`, a.step < a.steps.length - 1 ? `<button class="btn sm" type="button" data-act="afterNext" data-id="${a.id}">下一步</button>` : pill('已完成', 'ok')]), { num: [4] }) + `
+  <div class="grid g2 mt">${DB.after.map(a => `<div class="card"><h3>${a.id} · ${a.kind} <small>${custOf(a.cust).short}</small></h3><div class="stepper">${a.steps.map((x, i) => `<div class="st ${i < a.step ? 'done' : i === a.step ? 'now' : ''}"><span class="dot">${i < a.step ? ic('check') : ''}</span>${x}</div>`).join('')}</div></div>`).join('')}</div>
+  <p class="note">退货入库以易助销退单入账，本系统记录原因与处理过程，方便统计哪些型号问题最多。</p>`;
+
+V.receipts = () => {
+  const r = DB.receipts.find(x => x.id === S.arg) || DB.receipts.find(x => x.id === S.recSel) || DB.receipts[0];
+  S.recSel = r.id;
+  const cands = DB.contracts.flatMap(c => c.pay.map((p, i) => ({ c, p, i }))).filter(x => x.c.cur === r.cur && x.p[3] !== '已收');
+  const best = cands.find(x => custOf(x.c.cust).name.toUpperCase() === r.payer.replace(/\s+/g, ' ')) || cands.find(x => Math.abs(x.p[1] - r.amt) < 1);
+  const mismatch = best && custOf(best.c.cust).name.toUpperCase() !== r.payer;
+  const lk = curLock()[1];
+  return head('收款登记', '银行或收款平台的到账流水，按原币认领到 PI 的对应期数') + `
+  <div class="grid g2">
+    <div class="card"><h3>到账流水 <small>点一行认领</small></h3>${table(['流水', '日期', '付款人', '金额', '渠道', '状态'], DB.receipts.map(x => [mono(x.id), x.date, `<span class="wrap">${x.payer}</span>`, `${x.cur} ${fmt(x.amt, 2)}`, x.bank, x.claimed ? pill('已认领', 'ok') : pill('待认领', 'warn')]), { num: [3], click: i => `data-act="recSel" data-id="${DB.receipts[i].id}"`, sel: i => DB.receipts[i].id === r.id })}</div>
+    <div class="card"><h3>认领 ${mono(r.id)}</h3>
+      ${r.claimed ? `<div class="banner ok"><b>已认领</b><span>${r.claimed}<br>记账汇率 ${r.rate.toFixed(4)}，折合 ¥${fmt(r.amt * r.rate, 2)}${r.yz ? `<br>${r.yz}` : ''}</span></div>` : best ? `
+      <div class="kv"><div><span>付款人</span>${r.payer}</div><div><span>金额（原币）</span>${r.cur} ${fmt(r.amt, 2)}</div><div><span>建议对应</span>${best.c.pi} · ${best.p[0]}</div><div><span>合同买方</span>${custOf(best.c.cust).name}</div><div><span>记账汇率（本月锁定）</span>${lk.toFixed(4)}</div><div><span>折合人民币</span>¥${fmt(r.amt * lk, 2)}</div></div>
+      ${mismatch ? `<div class="banner warn mt"><b>付款人与买方不一致</b><span>外汇规定“谁出口谁收汇”，第三方代付要留存客户的付款委托书，否则可能影响出口退税。</span></div><label class="chk"><input type="checkbox" id="ackPayer"> 已取得客户付款委托书</label>` : '<div class="banner ok mt"><b>付款人与买方一致</b><span>可以直接认领。</span></div>'}
+      <div class="toolbar" style="margin-top:12px"><button class="btn pri" type="button" data-act="claim" data-id="${best.c.pi}|${best.i}">认领到 ${best.c.pi} ${best.p[0]}</button></div>` : '<p class="note">没有找到可对应的未收款项。</p>'}
+      <p class="note">认领后通知出纳在易助开收款单并核销对应销售发票；结汇时再记实际汇率，差额计入汇差。</p></div>
+  </div>`;
+};
+
+V.ar = () => {
+  const open = arOpen().filter(r => S.arF === '全部' || (S.arF === '逾期' ? daysPast(r.due) > 0 : agingBucket(daysPast(r.due)) === S.arF));
+  const all = arOpen(), sum = all.reduce((a, r) => a + r.amt - r.got, 0);
+  const by = BUCKETS.map(([b, col]) => [b, col, all.filter(r => agingBucket(daysPast(r.due)) === b).reduce((a, r) => a + r.amt - r.got, 0)]);
+  return head('应收跟催', '发票与核销读自易助，账龄按 30／60／90／180 天分段，跟催记录留在本系统') + `
+  <div class="grid g4">
+    <div class="card kpi"><div class="k">未收合计</div><div class="v">USD ${fmt(sum)}</div></div>
+    <div class="card kpi"><div class="k">逾期金额</div><div class="v dn">USD ${fmt(overdueAmt())}</div></div>
+    <div class="card kpi"><div class="k">逾期 90 天以上</div><div class="v dn">USD ${fmt(by[4][2] + by[5][2])}</div><div class="d">建议评估坏账风险</div></div>
+    <div class="card kpi"><div class="k">本月已回款</div><div class="v up">USD ${fmt(24800 + 12090)}</div></div>
+  </div>
+  <div class="card mt"><h3>账龄分布</h3><div class="aging">${by.map(([b, col, v]) => v ? `<i style="width:${v / sum * 100}%;background:${col}" title="${b} USD ${fmt(v)}"></i>` : '').join('')}</div>
+    <div class="legend">${by.map(([b, col, v]) => `<span><i style="background:${col}"></i>${b} · USD ${fmt(v)}</span>`).join('')}</div></div>
+  <div class="toolbar mt" style="margin-bottom:12px"><div class="filters">${['全部', '逾期', '未到期', '1–30 天', '31–60 天', '61–90 天', '91–180 天', '180 天以上'].map(f => `<button type="button" data-act="arF" data-id="${f}" aria-pressed="${S.arF === f}">${f}</button>`).join('')}</div></div>` +
+  table(['发票', 'PI', '客户', '负责业务', '到期日', '未收', '账龄', '最近跟催', ''], open.map(r => { const d = daysPast(r.due); return [mono(r.zp), mono(r.pi), custOf(r.cust).short, custOf(r.cust).sales, r.due, `${r.cur} ${fmt(r.amt - r.got, 2)}`, d > 0 ? pill(`逾期 ${d} 天`, d > 90 ? 'bad' : 'warn') : pill('未到期', 'mute'), r.log[0] ? `<span class="wrap">${r.log[0][0]} ${r.log[0][1]}：${r.log[0][2]}</span>` : '<span class="dn">尚未跟催</span>', d > 0 ? `<button class="btn sm" type="button" data-act="dun" data-id="${r.zp}">记录跟催</button>` : '']; }), { num: [5] }) +
+  `<p class="note">逾期第 1、15、30 天自动提醒负责业务；超过 90 天提醒老板。账龄分段可以在设置里调整。</p>`;
+};
+
+V.fx = () => {
+  const lk = curLock(), d = DB.fx.daily, last = d[d.length - 1], u = DB.fx.unsettled;
+  const W = 520, H = 150, mn = Math.min(...d.map(x => x[1]), lk[1]) - .003, mx = Math.max(...d.map(x => x[1]), lk[1]) + .003;
+  const X = i => 40 + i * (W - 60) / (d.length - 1), Y = v => 14 + (mx - v) / (mx - mn) * (H - 34);
+  const line = d.map((x, i) => `${X(i).toFixed(1)},${Y(x[1]).toFixed(1)}`).join(' ');
+  return head('汇率与结汇', '财务每月锁定一次记账汇率；结汇时记录实际汇率，差额就是汇差') + `
+  <div class="banner warn"><b>易助每日汇率需要更新</b><span>易助“每日汇率”最新一笔停在 ${DB.fx.yzLast}（USD ${DB.fx.yzRate}），之后没有再登记。本系统每月锁定后可同步写入易助，避免两边汇率不一致。</span></div>
+  <div class="grid g4">
+    <div class="card kpi"><div class="k">本月锁定汇率</div><div class="v">${lk[1].toFixed(4)}</div><div class="d">${lk[2]} · ${lk[3]}</div></div>
+    <div class="card kpi"><div class="k">今日参考汇率</div><div class="v">${last[1].toFixed(4)}</div><div class="d ${last[1] > lk[1] ? 'up' : 'dn'}">比锁定 ${last[1] > lk[1] ? '+' : ''}${fmt((last[1] - lk[1]) / lk[1] * 100, 2)}%</div></div>
+    <div class="card kpi"><div class="k">未结汇美元</div><div class="v">USD ${fmt(u)}</div><div class="d">按今日折 ¥${fmt(u * last[1])}</div></div>
+    <div class="card kpi"><div class="k">人民币每升值 1%</div><div class="v dn">−¥${fmt(u * last[1] * .01)}</div><div class="d">少收的人民币</div></div>
+  </div>
+  <div class="grid g2 mt">
+    <div class="card"><h3>参考汇率走势 <small>虚线为本月锁定汇率</small></h3><svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="近一周美元兑人民币参考汇率从 7.1395 升到 7.1503" style="width:100%;height:auto">
+      <line x1="40" x2="${W - 20}" y1="${Y(lk[1]).toFixed(1)}" y2="${Y(lk[1]).toFixed(1)}" stroke="var(--yz)" stroke-dasharray="4 4"/><text x="${W - 20}" y="${(Y(lk[1]) - 5).toFixed(1)}" text-anchor="end" style="fill:var(--yz)">锁定 ${lk[1].toFixed(4)}</text>
+      <polyline points="${line}" fill="none" stroke="var(--accent)" stroke-width="2"/>${d.map((x, i) => `<circle cx="${X(i).toFixed(1)}" cy="${Y(x[1]).toFixed(1)}" r="3" fill="var(--accent)"/><text x="${X(i).toFixed(1)}" y="${H - 4}" text-anchor="middle">${x[0]}</text>`).join('')}</svg></div>
+    <div class="card"><h3>登记结汇</h3><div class="form">
+      <label for="fx-amt">结汇金额（USD）<input id="fx-amt" type="number" value="${u}" min="0" step="100"></label>
+      <label for="fx-rate">银行结汇汇率<input id="fx-rate" type="number" value="${last[1].toFixed(4)}" step="0.0001"></label>
+    </div><div class="toolbar" style="margin-top:12px"><button class="btn pri" type="button" data-act="settle" ${u ? '' : 'disabled'}>登记结汇</button><button class="btn" type="button" data-act="toast" data-msg="已登记远期锁汇 USD 50,000 @ 7.1200（演示）">登记远期锁汇</button></div><p class="note">实际结汇汇率与记账汇率的差额，会带回对应 PI 的单票利润。</p></div>
+  </div>
+  <div class="grid g2 mt">
+    <div class="card"><h3>每月锁定记录</h3>${table(['月份', '汇率', '锁定人', '时间', '同步易助'], DB.fx.locks.map(l => [l[0], l[1].toFixed(4), l[2], l[3], pill('已写入', 'ok')]), { num: [1] })}<div class="toolbar" style="margin-top:12px"><button class="btn" type="button" data-act="toast" data-msg="12 月 1 日 9:00 会提醒财务锁定汇率（演示）">设定下月提醒</button></div></div>
+    <div class="card"><h3>结汇记录</h3>${table(['日期', '金额 USD', '结汇汇率', '对应'], DB.fx.hist.map(h => [h[0], fmt(h[1]), h[2].toFixed(4), h[3]]), { num: [1, 2] })}</div>
+  </div>`;
+};
+
+V.rebate = () => head('出口退税', '专票与报关单配对，申报前先检查品名、规格是否一致') + `
+  <div class="banner own"><b>申报期限</b><span>出口退税须在报关出口之日次月起至次年 4 月 30 日前申报。系统会对每张报关单倒数提醒。</span></div>` +
+  table(['报关单号', 'PI', '进项发票', '一致性', '可退税额 ¥', '状态', ''], DB.rebates.map(r => [mono(r.cd), mono(r.pi), r.inv, r.match === '一致' ? pill('一致', 'ok') : r.match === '—' ? '—' : pill(r.match, 'warn'), r.amt ? fmt(r.amt) : '—', r.st === '可申报' ? pill('可申报', 'ok') : r.st === '待更正' ? pill('待更正', 'warn') : pill(r.st, 'mute'), r.st === '待更正' ? `<button class="btn sm" type="button" data-act="toast" data-msg="已通知供应商重开专票，规格改为“100G QSFP28 LR4 光模块”（演示）">通知更正</button>` : '']), { num: [4] }) + `
+  <div class="card mt"><h3>不一致明细 <small>PI20261015BKN</small></h3>${table(['项目', '报关单', '进项专票', '结果'], [['品名', '光模块', '光模块', pill('一致', 'ok')], ['规格', '10G SFP+ LR 10km', 'SFP+ 10G 光收发器', pill('写法不同', 'warn')], ['数量', '3,000 只', '3,000 个', pill('单位需核对', 'warn')]])}<p class="note">规格、单位写法不同可能被退税审核退回，提前在这里发现。</p></div>`;
+
+V.profit = () => {
+  const c = scOf('PI20261021SGF');
+  const rows = [['收入（折人民币）', 177151, 176948], ['生产成本', -152000, -152760], ['运费与杂费', -4300, -4428], ['退税', 17489, 17489], ['佣金', -3540, -3540]];
+  const est = rows.reduce((a, r) => a + r[1], 0), act = rows.reduce((a, r) => a + r[2], 0);
+  const diffs = rows.map(r => [r[0], r[2] - r[1]]).filter(d => d[1]), maxAbs = Math.max(...diffs.map(d => Math.abs(d[1])));
+  const W = 520, mid = 300;
+  const bars = diffs.map(([n, d], i) => { const w = Math.abs(d) / maxAbs * 180, y = 14 + i * 40, x = d < 0 ? mid - w : mid; return `<text x="8" y="${y + 17}" style="fill:var(--ink);font-size:12.5px">${n}</text><rect x="${x.toFixed(1)}" y="${y}" width="${w.toFixed(1)}" height="26" rx="5" fill="${d < 0 ? 'var(--bad)' : 'var(--ok)'}" opacity=".8"/><text x="${d < 0 ? (x - 6).toFixed(1) : (x + w + 6).toFixed(1)}" y="${y + 17}" text-anchor="${d < 0 ? 'end' : 'start'}" style="fill:var(--ink)">${d < 0 ? '−' : '+'}¥${fmt(Math.abs(d))}</text>`; }).join('');
+  return head('单票利润', `${c.pi} · ${custOf(c.cust).short} · 预估与实际对比（人民币）`) + `
+  <div class="grid g4">
+    <div class="card kpi"><div class="k">预估利润</div><div class="v">¥${fmt(est)}</div></div>
+    <div class="card kpi"><div class="k">实际利润</div><div class="v">¥${fmt(act)}</div><div class="d dn">比预估少 ¥${fmt(est - act)}</div></div>
+    <div class="card kpi"><div class="k">预估毛利率</div><div class="v">${fmt(est / rows[0][1] * 100, 1)}%</div></div>
+    <div class="card kpi"><div class="k">实际毛利率</div><div class="v">${fmt(act / rows[0][2] * 100, 1)}%</div></div>
+  </div>
+  <div class="grid g2 mt">
+    <div class="card"><h3>差异拆解 <small>实际减预估</small></h3><svg class="chart" viewBox="0 0 ${W} ${14 + diffs.length * 40}" role="img" aria-label="利润差异：汇差少 203 元，生产成本多 760 元，运费多 128 元" style="width:100%;height:auto"><line x1="${mid}" x2="${mid}" y1="6" y2="${10 + diffs.length * 40}" stroke="var(--line)"/>${bars}</svg><p class="note">生产成本读自易助（月加权平均）；收入差异来自汇差：报价按 7.1432，结汇 7.1350。</p></div>
+    <div class="card"><h3>各合同利润</h3>${table(['PI', '客户', '预估', '实际', '状态'], DB.contracts.map(x => [piBtn(x.pi), custOf(x.cust).short, '¥' + fmt(x.est), x.act == null ? '—' : '¥' + fmt(x.act), x.act == null ? pill('进行中', 'run') : pill('已结案', 'ok')]), { num: [2, 3] })}</div>
+  </div>`;
+};
+
+V.comm = () => {
+  const fxr = curLock()[1];
+  const rows = ['林晓', '陈一凡', '周可'].map(n => {
+    const cs = DB.contracts.filter(c => c.sales === n);
+    const rev = cs.reduce((a, c) => a + total(c) * (c.cur === 'USD' ? fxr : 1), 0), gp = cs.reduce((a, c) => a + (c.act ?? c.est), 0);
+    const got = cs.reduce((a, c) => a + c.pay.filter(p => p[3] === '已收').reduce((x, p) => x + p[1], 0) * (c.cur === 'USD' ? fxr : 1), 0);
+    const ratio = S.perfCash ? got / Math.max(1, rev) : 1, base = S.perfRule === 'gp' ? gp : rev, rate = S.perfRule === 'gp' ? .12 : .008;
+    return [n, cs.length, '¥' + fmt(rev), '¥' + fmt(gp), fmt(ratio * 100, 0) + '%', '¥' + fmt(base * rate * ratio)];
+  });
+  return head('业绩与提成', '每张合同记录“归属业务”，与录单人分开；业绩与提成按归属业务统计') + `
+  <div class="grid g23">
+    <div class="card"><h3>提成规则</h3><div style="display:grid;gap:10px">
+      <label class="chk"><input type="radio" name="pr" ${S.perfRule === 'gp' ? 'checked' : ''} data-act="perfRule" data-id="gp"> 按毛利的 12%</label>
+      <label class="chk"><input type="radio" name="pr" ${S.perfRule === 'rev' ? 'checked' : ''} data-act="perfRule" data-id="rev"> 按销售额的 0.8%</label>
+      <label class="chk"><input type="checkbox" ${S.perfCash ? 'checked' : ''} data-act="perfCash"> 以回款为准（没收到的钱不计提成）</label>
+    </div><p class="note">外销金额按本月锁定汇率折算。退税是否计入毛利、提成何时发放，依贵司口径设定。</p></div>
+    <div class="card"><h3>本月业绩与提成试算</h3>${table(['归属业务', '合同数', '销售额', '毛利', '回款比例', '提成'], rows, { num: [1, 2, 3, 4, 5] })}
+    <p class="note">建单人可以是助理或跟单，“归属业务”才是业绩的依据；移交客户时可选择是否连同进行中的合同一起移交。</p></div>
+  </div>`;
+};
+
+V.trace = () => {
+  const c = scOf(S.traceSel) || DB.contracts[0];
+  return head('订单追溯', '从 PI 一路查到易助订单、工单、委外、出库、发票与收款') + `
+  <div class="grid g23">
+    <div class="card"><h3>选择 PI</h3>${table(['PI', '客户', '节点'], DB.contracts.map(x => [mono(x.pi), custOf(x.cust).short, scStatus(x)]), { click: i => `data-act="traceSel" data-id="${DB.contracts[i].pi}"`, sel: i => DB.contracts[i].pi === c.pi })}</div>
+    <div class="card"><h3>${c.pi} <small>${custOf(c.cust).name}</small></h3>${traceTree(c)}<div class="toolbar" style="margin-top:12px"><button class="btn" type="button" data-go="contract|${c.pi}">打开合同</button><button class="btn" type="button" data-act="toast" data-msg="已复制进度链接，可发给客户（演示）">${ic('copy')}复制进度给客户</button></div></div>
+  </div>`;
+};
+
+V.prod = () => {
+  const b = DB.bom, cost = b.parts.reduce((a, p) => a + p[2] * p[3], 0);
+  return head('生产与库存', '工单、委外、库存与 BOM 都读自易助，业务看得到但不能修改') + yzBanner('工单、委外、库存与 BOM') + `
+  <div class="card"><h3>工单 <small>前置单号就是易助订单号，可对回 PI</small></h3>${table(['工单', '易助订单', 'PI', '内部品号', '数量', '已完工', '预计完工', '状态'], DB.wos.map(w => { const c = DB.contracts.find(x => x.xs === w.xs); return [mono(w.id), mono(w.xs), c ? piBtn(c.pi) : '—', mono(w.item), fmt(w.qty), fmt(w.done), w.due, w.st.startsWith('欠料') ? pill(w.st, 'bad') : w.st === '已完工' ? pill(w.st, 'ok') : w.st === '待领料' ? pill(w.st, 'mute') : pill(`${w.st} ${Math.round(w.done / w.qty * 100)}%`, 'run')]; }), { num: [4, 5] })}</div>
+  <div class="grid g2 mt">
+    <div class="card"><h3>委外贴片</h3>${table(['委外单', '外协厂', '主件', '数量', '已送料', '已回货', '预计回货'], DB.wws.map(w => [mono(w.id), w.sup, mono(w.item), w.qty, w.sent, w.back, w.due]), { num: [3, 4, 5] })}<p class="note">芯片、电容电阻由我方送料给外协厂，回货后经检验入库。</p></div>
+    <div class="card"><h3>成品库存 <small>可用 = 现有 − 已分配</small></h3>${table(['客户品号', '品名', '现有', '已分配', '可用', '可齐套'], DB.stock.map(r => [mono(r[0]), r[1], fmt(r[3]), fmt(r[4]), fmt(r[3] - r[4]), fmt(r[5])]), { num: [2, 3, 4, 5] })}<p class="note">“可齐套”是依现有料件还能生产的数量，接单前先看这里。</p></div>
+  </div>
+  <div class="card mt"><h3>客户品号与 BOM <small>${b.code} → ${b.inner}</small></h3>
+    <div class="lvl" style="margin-bottom:12px"><span class="chip on">${b.code}</span><span class="sep">客户品号（销售用）</span><span class="sep">→</span><span class="chip">${b.inner}</span><span class="sep">内部品号（生产用）</span></div>
+    ${table(['子件', '名称', '用量', '参考单价 ¥', '小计 ¥', '来源'], b.parts.map(p => [mono(p[0]), p[1], p[2], fmt(p[3], 2), fmt(p[2] * p[3], 2), p[4]]), { num: [2, 3, 4] })}
+    <p class="note">材料成本约 ¥${fmt(cost, 2)}／只，报价时可作为成本底价参考。</p></div>`;
+};
+
+V.yzlink = () => {
+  const flows = [
+    ['客户、品号、BOM', '易助', '易助 → 本系统', '只读同步', '11-18 10:15', '7 / 5 / 5'],
+    ['报价、PI、出运单证、原币收款登记', '本系统', '本系统新建', '—', '—', '—'],
+    ['订单（含 PI 号、归属业务）', '本系统产生', '本系统 → 易助', 'Excel 订单汇入', '11-03 10:12', '5 张'],
+    ['订单变更', '本系统', '本系统 → 易助', '订单变更单汇入', '11-17 16:40', '1 张'],
+    ['工单、委外、生产进度', '易助', '易助 → 本系统', '只读，用订单号对回 PI', '11-18 10:15', '5 张'],
+    ['出库、销货', '易助', '易助 → 本系统', '只读，只取已审核', '11-18 10:15', '3 张'],
+    ['销售发票、应收、核销', '易助', '易助 → 本系统', '只读，显示在合同收款页', '11-18 10:15', '7 张'],
+    ['每月记账汇率', '本系统', '本系统 → 易助', '写入每日汇率表', '11-01 09:12', '1 笔']
+  ];
+  return head('对接状态', '谁是主档、往哪个方向同步、最近一次是什么时候') + `
+  <div class="grid g4">
+    <div class="card kpi"><div class="k">同步状态</div><div class="v up">正常</div><div class="d">最近一次 11-18 10:15</div></div>
+    <div class="card kpi"><div class="k">对照编号</div><div class="v" style="font-size:17px">PI ⇄ XS</div><div class="d">PI 写进易助“客户单号”</div></div>
+    <div class="card kpi"><div class="k">今日汇入</div><div class="v">0</div><div class="d">本周 2 批</div></div>
+    <div class="card kpi"><div class="k">待处理</div><div class="v dn">1</div><div class="d">信用额度待审批</div></div>
+  </div>
+  <div class="card mt"><h3>数据流向</h3>${table(['数据', '主档', '方向', '方式', '最近同步', '笔数'], flows.map(f => [f[0], f[1] === '易助' ? yzTag : ownTag, f[2], f[3], f[4], f[5]]))}</div>
+  <div class="grid g2 mt">
+    <div class="card"><h3>汇入批次</h3>${table(['批次', '时间', '类型', '内容', '结果'], DB.batches.map(b => [mono(b[0]), b[1], b[2], `<span class="wrap">${b[3]}</span>`, b[4] === '已汇入' ? pill('已汇入', 'ok') : pill(b[4], 'warn')]))}</div>
+    <div class="card"><h3>上线时的历史资料</h3>${table(['资料', '处理方式'], [['客户、品号、BOM', '直接读易助，不用迁移'], ['进行中订单', '按 XS 号补登 PI，建立对照'], ['易助报价附件', '导入附件清单，按客户与产品可查'], ['未收应收', '读易助发票与核销，不另建账']])}
+      <p class="note">对接用易助只读数据库账号（不用管理员账号），只读已审核的单据；写入一律走官方 Excel 汇入，不直接改易助数据库。</p></div>
+  </div>`;
+};
+
+V.apprset = () => {
+  const docs = [['报价单', '毛利低于 12%', '业务主管', '总经理（毛利低于 8%）', '业务助理'], ['合同（PI）', '超过信用额度或金额 > USD 100,000', '业务主管', '总经理', '财务'], ['订单变更', '任何变更', '业务主管', '—', '跟单、生产计划'], ['收款认领', '付款人与买方不一致', '财务主管', '—', '负责业务'], ['样品借出', '单次价值 > USD 500', '业务主管', '—', '仓库'], ['出运', '合规检查未通过', '单证主管', '—', '负责业务']];
+  const sel = (id, v, opts) => `<select id="${id}" aria-label="审批人">${opts.map(o => `<option ${o === v ? 'selected' : ''}>${o}</option>`).join('')}</select>`;
+  const P = ['业务主管', '财务主管', '单证主管', '总经理', '—'];
+  return head('审批设置', '每种单据各自设定：什么情况要审批、谁审、批完通知谁') + `
+  <div class="banner own"><b>默认两段</b><span>“送审＋审核”两段，与易助现在的做法一致。需要时可以加到第 3～6 层，或设金额门槛与会签。</span></div>
+  <div class="tbl"><table><thead><tr><th>单据</th><th>触发条件</th><th>第 1 层</th><th>第 2 层</th><th>批完通知</th><th></th></tr></thead><tbody>${docs.map((d, i) => `<tr><td><b>${d[0]}</b></td><td class="wrap">${d[1]}</td><td>${sel('ap1-' + i, d[2], P)}</td><td>${d[3] === '—' ? '<span class="note" style="margin:0">不需要</span>' : `<span class="wrap">${d[3]}</span>`}</td><td class="wrap">${d[4]}</td><td><button class="btn sm" type="button" data-act="toast" data-msg="已为「${d[0]}」新增一层审批（演示）">${ic('plus')}加一层</button></td></tr>`).join('')}</tbody></table></div>
+  <div class="grid g2 mt">
+    <div class="card"><h3>审批方式</h3><div style="display:grid;gap:10px"><label class="chk"><input type="radio" name="am" checked> 依序审批（第 1 层通过才到第 2 层）</label><label class="chk"><input type="radio" name="am"> 会签（同一层所有人都要同意）</label><label class="chk"><input type="checkbox" checked> 推送到企业微信</label><label class="chk"><input type="checkbox" checked> 超过 24 小时未处理，提醒上一级</label></div></div>
+    <div class="card"><h3>预览：报价单毛利 9.4%</h3><div class="trace">
+      <div class="tn"><span class="dot d"></span><span class="lbl"><b>送审</b><span>周可 · 11-17 16:02</span></span><span></span></div>
+      <div class="tn"><span class="dot a"></span><span class="lbl"><b>第 1 层 · 业务主管</b><span>等待处理，已推送企业微信</span></span><span></span></div>
+      <div class="tn"><span class="dot w"></span><span class="lbl"><b>通知业务助理</b><span>审批完成后</span></span><span></span></div>
+    </div></div>
+  </div>
+  <div class="toolbar mt"><button class="btn pri" type="button" data-act="toast" data-msg="审批设置已保存（演示）">保存设置</button></div>`;
+};
+
+V.category = () => {
+  const opt = { 业务类型: ['外销', '内销', '—'], 用途: ['量产', '样品', '验证', '需求预测', '—'], 产品线: ['光模块', '芯片', '—'] };
+  const map = [['外贸', '业务类型', '外销'], ['国外', '业务类型', '外销'], ['内贸', '业务类型', '内销'], ['国内', '业务类型', '内销'], ['样品', '用途', '样品'], ['验证', '用途', '验证'], ['需求', '用途', '需求预测'], ['芯片', '产品线', '芯片'], ['22', '项目号', '待确认'], ['365', '项目号', '待确认'], ['647', '项目号', '待确认']];
+  return head('业务分类', '易助“性质类型”一个下拉混了内外销、用途、产品线和项目号，这里拆成四个字段') + `
+  <div class="grid g2">
+    <div class="card"><h3>现有值怎么对应 <small>易助 → 本系统</small></h3><div style="display:grid;gap:8px">${map.map(([o, f, v], i) => `<div class="map"><span class="old">${o}</span><span class="arr">→</span><span class="toolbar" style="flex-wrap:nowrap"><span class="tag own">${f}</span>${f === '项目号' ? pill('请贵司确认含义', 'warn') : `<select id="cat-${i}" aria-label="${o} 对应值" style="width:auto">${opt[f].map(x => `<option ${x === v ? 'selected' : ''}>${x}</option>`).join('')}</select>`}</span></div>`).join('')}</div></div>
+    <div class="card"><h3>拆分后的四个字段</h3>${table(['字段', '可选值', '用在哪里'], [['业务类型', '外销、内销', '流程节点、单证、开票'], ['用途', '量产、样品、验证、需求预测', '样品统计、利润分开看'], ['产品线', '光模块、芯片', '业绩与毛利按产品线'], ['项目号', '自由输入', '对应客户项目或专案']])}
+      <p class="note">拆开后，报表才能直接按“外销量产”“样品”分开统计；同步回易助时，仍写回原来的性质值，易助那边不用改。</p>
+      <h3 class="mt">示例：一张合同</h3><div class="lvl"><span class="chip on">外销</span><span class="sep">·</span><span class="chip on">量产</span><span class="sep">·</span><span class="chip on">光模块</span><span class="sep">·</span><span class="chip">项目号（空）</span></div></div>
+  </div>`;
+};
+
+V.perm = () => {
+  const roles = [['业务员', '自己的客户与合同', '可看', '隐藏', '隐藏'], ['业务主管', '本部门', '可看', '可看', '可看'], ['跟单', '分配给自己的合同', '可看', '隐藏', '隐藏'], ['单证', '全部出运', '隐藏', '隐藏', '隐藏'], ['财务', '全部', '可看', '可看', '可看'], ['总经理', '全部', '可看', '可看', '可看']];
+  const cell = v => v === '可看' ? pill('可看', 'ok') : pill('隐藏', 'mute');
+  return head('权限', '按角色决定看得到哪些客户、哪些字段') + `
+  <div class="banner ok"><b>新账号默认看不到任何客户</b><span>先指定角色与负责的客户范围才开放，避免新账号一建好就看到全部客户与供应商资料。</span></div>` +
+  table(['角色', '数据范围', '售价', '成本与底价', '利润'], roles.map(r => [`<b>${r[0]}</b>`, r[1], cell(r[2]), cell(r[3]), cell(r[4])])) + `
+  <p class="note">业务员的客户范围可按“负责业务＋客户地区”限定，与易助现有的“用户限定基础数据”一致。</p>`;
+};
+
+V.country = () => head('国家配置', '开拓新国家只改配置，不改程序') +
+  table(['国家', '语言', '币种', '日期格式', '产地证', '合规要点'], [['越南', '英文、越南文', 'USD', 'DD/MM/YYYY', 'Form E', '越文标签'], ['泰国', '英文', 'USD', 'DD/MM/YYYY', 'RCEP / Form E', '—'], ['菲律宾', '英文', 'USD', 'MM/DD/YYYY', 'Form E', '—'], ['印尼', '英文、印尼文', 'USD', 'DD/MM/YYYY', 'Form E', 'SDPPI 认证（通信设备）'], ['墨西哥', '英文、西班牙文', 'USD', 'DD/MM/YYYY', '原产地声明', '进口商 RFC 税号'], ['德国', '英文、德文', 'USD／EUR', 'DD.MM.YYYY', '—', 'CE、RoHS 声明']]) +
+  `<p class="note">单证模板、发票语言、金额小数位都跟着国家走。</p>`;
+
+V.window = () => head('国际贸易单一窗口', '先做“导出符合格式的资料”，再评估直接对接') + `
+  <div class="grid g2">
+    <div class="card"><h3>可导出的资料</h3>${table(['资料', '格式', '状态'], [['报关单草稿', '单一窗口导入格式', pill('可用', 'ok')], ['原产地证申请', 'Form E / RCEP', pill('可用', 'ok')], ['商业发票与装箱单', 'PDF、Excel', pill('可用', 'ok')]])}<div class="toolbar" style="margin-top:12px"><button class="btn pri" type="button" data-act="toast" data-msg="已导出 SH-2611-03 报关资料（演示）">导出 SH-2611-03</button></div></div>
+    <div class="card"><h3>为什么先导出</h3><p class="note" style="margin-top:0">单一窗口直接对接需要企业资质与接口申请，时间较长。先导出符合格式的资料，单证员复制导入即可，已经能省掉大部分重复输入。</p></div>
+  </div>`;
+
+V.portal = () => head('客户门户', '客户用链接登录，只看自己的 PI 与单证') + `
+  <div class="grid g2">
+    <div class="card"><h3>客户看到的画面</h3><div class="phone"><div class="pc"><h5>Kepler Telecom · Orders</h5>
+      <div style="display:grid;gap:8px">${[['PI20261103KEP', 'In production 45%', 'ETD 11-28'], ['PI20260912KEP', 'Delivered', 'Invoice due']].map(r => `<div style="border-top:1px solid var(--line);padding-top:8px"><b class="m">${r[0]}</b><br><span style="color:var(--muted)">${r[1]} · ${r[2]}</span></div>`).join('')}</div>
+      <div class="toolbar" style="margin-top:10px"><span class="btn sm">Download PI</span><span class="btn sm">Packing list</span></div></div></div></div>
+    <div class="card"><h3>外协厂看到的画面</h3><p class="note" style="margin-top:0">外协厂只看到分配给自己的委外单、送料清单与预计回货日，可以上传回货照片与检验报告。</p>${table(['委外单', '主件', '数量', '预计回货'], [[mono('WW20261116001'), 'PCBA-QS100', 220, '11-23']], { num: [2] })}</div>
+  </div>`;
+</script>
+<script>
+/* ================= 外框 ================= */
+function side() {
+  const badge = { approvals: pendingAp(), receipts: DB.receipts.filter(r => !r.claimed).length, ar: arOpen().filter(r => daysPast(r.due) > 0).length, samples: DB.samples.filter(s => s.st === '逾期未还').length };
+  const cur = S.view === 'contract' ? 'contracts' : S.view;
+  $('side').innerHTML = `<div class="brand"><span class="mk">光</span><div><b>光数外贸</b><small>演示版 v0.5 · 示例数据</small></div></div>` +
+    NAV.map(([g, items]) => `<div class="grp">${g}</div>` + items.map(([k, n]) => `<button type="button" class="nav" data-go="${k}" ${cur === k ? 'aria-current="page"' : ''}>${ic(k)}<span>${n}</span>${badge[k] ? `<span class="ct ${k === 'approvals' || k === 'ar' ? 'hot' : ''}">${badge[k]}</span>` : ''}</button>`).join('')).join('') +
+    `<div class="foot">所有客户、金额、人名均为虚构示例。<br>标“易助”的资料表示上线后由易助只读同步。</div>`;
+}
+function topbar() {
+  const t = TITLE[S.view] || ['', ''];
+  const sk = document.documentElement.dataset.skin;
+  $('top').innerHTML = `<button class="menu" type="button" data-act="menu" aria-label="打开导航">${ic('menu')}</button>
+    <div class="crumb">${t[0]} <span>›</span> <b>${S.view === 'contract' ? (S.arg || '合同明细') : t[1]}</b></div>
+    <div class="search">${ic('search')}<input id="q" type="search" placeholder="搜索 PI 号、XS 号、客户、工单" autocomplete="off" aria-label="搜索"><div class="results" id="results" hidden></div></div>
+    <div class="skin" role="group" aria-label="外观"><button type="button" data-act="skin" data-id="light" aria-pressed="${sk !== 'dark'}">${ic('sun')}<span>浅色</span></button><button type="button" data-act="skin" data-id="dark" aria-pressed="${sk === 'dark'}">${ic('moon')}<span>深色</span></button></div>
+    <span class="who" title="林晓 · 业务">林</span>`;
+}
+function drawer() {
+  $('layer').innerHTML = S.drawer ? `<div class="layer" data-act="close"></div><aside class="drawer" role="dialog" aria-modal="true" aria-label="客户中心">${custDrawer(S.drawer)}</aside>` : '';
+}
+function render() {
+  side(); topbar();
+  $('main').innerHTML = `<div class="view">${V[S.view]()}</div>`;
+  drawer();
+}
+function go(spec) {
+  const [v, a, t] = String(spec).split('|');
+  if (v === 'customers' && a) { S.view = 'customers'; S.drawer = a; render(); return; }
+  if (v === 'contracts' && a) { S.scF = a; S.view = 'contracts'; S.arg = null; }
+  else if (v === 'ship' && a) { S.shipSel = a; S.view = 'ship'; S.arg = null; }
+  else if (v === 'receipts' && a) { S.recSel = a; S.view = 'receipts'; S.arg = null; }
+  else { S.view = V[v] ? v : 'dash'; S.arg = a || null; if (v === 'contract') S.tab = t || 'lines'; }
+  S.drawer = null; $('side').classList.remove('open');
+  render(); window.scrollTo(0, 0);
+  try { if (location.hash !== '#' + S.view) history.replaceState(null, '', '#' + S.view); } catch (_) {}
+}
+
+/* ================= 外观：浅色＝素白，深色＝墨石 ================= */
+let skinSaved = null;
+try { skinSaved = localStorage.getItem('erp5-skin'); } catch (_) {}
+function systemSkin() {
+  const t = document.documentElement.dataset.theme;
+  if (t === 'dark' || t === 'light') return t;
+  return window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+function applySkin(s) { document.documentElement.dataset.skin = s; }
+applySkin(skinSaved || systemSkin());
+try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (!skinSaved) { applySkin(systemSkin()); topbar(); } }); } catch (_) {}
+try { new MutationObserver(() => { if (!skinSaved) { const s = systemSkin(); if (document.documentElement.dataset.skin !== s) { applySkin(s); topbar(); } } }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] }); } catch (_) {}
+
+/* ================= 需求确认导出 ================= */
+function save() { try { localStorage.setItem('erp5-req', JSON.stringify(S.choice)); localStorage.setItem('erp5-note', JSON.stringify(S.note)); } catch (_) {} }
+function exportText() {
+  const lines = ['【外贸 ERP 需求确认结果 · v0.5】'];
+  REQ.forEach(([g, , items]) => {
+    lines.push('', `■ ${g}`);
+    items.forEach(([id, name]) => { lines.push(`- ${name}：${CH[S.choice[id]] || '未选'}`); if (S.note[id]) lines.push(`  意见：${S.note[id]}`); });
+  });
+  if (S.note._all) lines.push('', '■ 其他意见', S.note._all);
+  return lines.join('\n');
+}
+
+let tt;
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.hidden = false; t.style.animation = 'none'; void t.offsetWidth; t.style.animation = ''; clearTimeout(tt); tt = setTimeout(() => { t.hidden = true; }, 2800); }
+function keep(fn) { const y = window.scrollY; fn(); window.scrollTo(0, y); }
+let seqQ = 3, seqP = 1;
+
+/* ================= 操作 ================= */
+const ACT = {
+  toast: el => toast(el.dataset.msg),
+  menu: () => $('side').classList.toggle('open'),
+  skin: el => { skinSaved = el.dataset.id; try { localStorage.setItem('erp5-skin', skinSaved); } catch (_) {} applySkin(skinSaved); topbar(); },
+  close: () => { S.drawer = null; drawer(); },
+  openCust: el => { S.drawer = el.dataset.id; drawer(); },
+  claimCust: el => { const c = custOf(el.dataset.id); c.pool = '私海'; c.sales = '林晓'; keep(render); toast(`已领取 ${c.short}，归属林晓`); },
+  custF: el => { S.custF = el.dataset.id; keep(render); },
+  scF: el => { S.scF = el.dataset.id; keep(render); },
+  sampleF: el => { S.sampleF = el.dataset.id; keep(render); },
+  arF: el => { S.arF = el.dataset.id; keep(render); },
+  tab: el => { S.tab = el.dataset.id; keep(render); },
+  shipSel: el => { S.shipSel = el.dataset.id; keep(render); },
+  recSel: el => { S.recSel = el.dataset.id; S.arg = null; keep(render); },
+  traceSel: el => { S.traceSel = el.dataset.id; keep(render); },
+  perfRule: el => { S.perfRule = el.dataset.id; keep(render); },
+  perfCash: () => { S.perfCash = !S.perfCash; keep(render); },
+  apply: () => { ALL.forEach(r => { S.choice[r[0]] = r[2] === 'r2' || r[2] === 'ro' ? 'later' : 'yes'; }); save(); keep(render); toast('已按建议选好，可以再逐项调整'); },
+  reset: () => { S.choice = {}; save(); keep(render); toast('已清空选择'); },
+  copy: () => { const t = $('exportText'); const done = () => toast('已复制，可以贴到微信或邮件');
+    try { navigator.clipboard.writeText(t.value).then(done, () => { t.select(); toast('请按 Ctrl+C 复制已选中的文字'); }); } catch (_) { t.select(); toast('请按 Ctrl+C 复制已选中的文字'); } },
+  approve: el => {
+    const a = DB.approvals.find(x => x.id === el.dataset.id); a.status = '已核准';
+    if (a.ref === 'PI20261009MNO') { const c = scOf(a.ref); delete c.block; c.xs = 'XS20261100075'; c.node = 3; DB.batches.unshift(['IMP-1118-01', '11-18 10:32', '订单', 'PI20261009MNO → XS20261100075', '已汇入']); DB.batches = DB.batches.filter(b => b[0] !== 'IMP-1109-01'); toast('已核准，订单已汇入易助 XS20261100075'); }
+    else if (a.ref === 'BG-0013') { const ch = DB.changes.find(x => x.id === 'BG-0013'); ch.st = '已同步易助'; scOf(ch.pi).ver = 2; toast('已核准，易助订单变更单 V002 已建立'); }
+    else if (a.ref === 'BJ2026111702') { DB.quotes.find(q => q.id === a.ref).status = '已批准'; toast('已核准，报价可以转 PI'); }
+    else toast('已核准');
+    keep(render);
+  },
+  reject: el => { const a = DB.approvals.find(x => x.id === el.dataset.id); a.status = '已退回'; keep(render); toast(`已退回给 ${a.who}`); },
+  saveQuote: () => {
+    const q = S.q, id = 'BJ20261118' + String(seqQ++).padStart(2, '0'), low = S.calc.rate < 12;
+    DB.quotes.unshift({ id, ver: 1, cust: q.cust, prod: q.prod, qty: q.qty, price: +S.calc.price.toFixed(2), margin: +S.calc.rate.toFixed(1), status: low ? '待审批' : '已发客户', att: 0, sales: '林晓' });
+    if (low) DB.approvals.unshift({ id: 'AP-4' + (13 + seqQ), type: '报价毛利低于门槛', ref: id, who: '林晓', detail: `毛利 ${fmt(S.calc.rate, 1)}%，门槛 12%`, status: '待审批', step: '第 1 层 · 业务主管', go: 'quote' });
+    keep(render); toast(low ? `${id} 已保存并送业务主管审批` : `${id} 已保存`);
+  },
+  toContract: el => {
+    const q = DB.quotes.find(x => x.id === el.dataset.id), cu = custOf(q.cust);
+    const pi = 'PI20261118' + cu.short.replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCase();
+    q.status = '已转合同'; q.pi = pi;
+    DB.contracts.unshift({ pi, xs: '', cust: q.cust, type: '外销', term: 'FOB 深圳', cur: 'USD', sales: q.sales, lines: [[q.prod, q.qty, q.price]], node: 1, ver: 1, pay: [['订金 30%', +(q.qty * q.price * .3).toFixed(2), '11-25', '未收'], ['出货前 70%', +(q.qty * q.price * .7).toFixed(2), '12-20', '未收']], wo: [], ww: '', ck: '', xh: '', zp: '', est: Math.round(q.qty * q.price * curLock()[1] * q.margin / 100), act: null, co: '—', late: 0, use: '量产' });
+    go('contract|' + pi); toast(`已生成 ${pi}，确认后汇入易助`);
+  },
+  advance: el => {
+    const c = scOf(el.dataset.id), n = NODES[c.type];
+    if (c.node === 1 && !c.xs) { c.xs = 'XS2026111' + String(80 + seqP++); DB.batches.unshift(['IMP-1118-0' + seqP, '11-18 10:40', '订单', `${c.pi} → ${c.xs}`, '已汇入']); }
+    c.node = Math.min(c.node + 1, n.length - 1); c.late = 0;
+    keep(render); toast(`${c.pi} 进入「${n[c.node]}」${c.node === 2 ? '，订单已汇入易助 ' + c.xs : ''}`);
+  },
+  sampleWin: el => { const s = DB.samples.find(x => x.id === el.dataset.id); s.st = '已转订单'; s.note = '测试通过，已建立报价单'; S.q.cust = s.cust; S.q.prod = s.prod; go('quote'); toast(`${custOf(s.cust).short} 测试通过，已带入报价`); },
+  genDocs: el => { const s = DB.ships.find(x => x.id === el.dataset.id); Object.keys(s.docs).forEach(k => { s.docs[k] = 1; }); keep(render); toast(`${s.id} 单证已全部生成并存档`); },
+  afterNext: el => { const a = DB.after.find(x => x.id === el.dataset.id); a.step = Math.min(a.step + 1, a.steps.length - 1); keep(render); toast(`${a.id} 进入「${a.steps[a.step]}」`); },
+  claim: el => {
+    const [pi, i] = el.dataset.id.split('|'), c = scOf(pi), r = DB.receipts.find(x => x.id === S.recSel);
+    const ack = $('ackPayer');
+    if (ack && !ack.checked) { toast('请先确认已取得客户付款委托书'); ack.focus(); return; }
+    c.pay[+i][3] = '已收'; r.claimed = `${pi} · ${c.pay[+i][0]}`; r.rate = curLock()[1]; r.yz = '已通知出纳在易助开收款单';
+    DB.fx.unsettled += r.amt;
+    keep(render); toast(`已认领到 ${pi}，折合 ¥${fmt(r.amt * r.rate, 2)}`);
+  },
+  dun: el => { const r = DB.ar.find(x => x.zp === el.dataset.id); r.log.unshift(['11-18', custOf(r.cust).ch, '已提醒付款，等待客户回复']); keep(render); toast(`已记录 ${r.zp} 的跟催`); },
+  settle: () => {
+    const a = Math.min(+$('fx-amt').value || 0, DB.fx.unsettled), rate = +$('fx-rate').value || 0;
+    if (!a || !rate) { toast('请填写结汇金额与汇率'); return; }
+    DB.fx.hist.unshift(['11-18', a, rate, '本次结汇']); DB.fx.unsettled -= a;
+    const diff = a * (rate - curLock()[1]);
+    keep(render); toast(`已登记结汇 USD ${fmt(a)}，汇差 ${diff >= 0 ? '+' : '−'}¥${fmt(Math.abs(diff), 2)}`);
+  }
+};
+
+/* ================= 搜索 ================= */
+function searchIndex() {
+  return [
+    ...DB.contracts.map(c => [c.pi + ' ' + c.xs + ' ' + custOf(c.cust).name, c.pi, `${custOf(c.cust).short}${c.xs ? ' · ' + c.xs : ''}`, 'contract|' + c.pi]),
+    ...DB.customers.map(c => [c.name + ' ' + c.short + ' ' + c.yz, c.name, c.country, 'customers|' + c.id]),
+    ...DB.quotes.map(q => [q.id + ' ' + custOf(q.cust).name, q.id, '报价单', 'quote']),
+    ...DB.wos.map(w => [w.id + ' ' + w.xs, w.id, '易助工单', 'prod']),
+    ...DB.samples.map(s => [s.id + ' ' + s.jc + ' ' + custOf(s.cust).name, s.id, '样品', 'samples'])
+  ];
+}
+function search(v) {
+  const box = $('results'); if (!box) return;
+  const k = v.trim().toLowerCase();
+  if (!k) { box.hidden = true; return; }
+  const hits = searchIndex().filter(x => x[0].toLowerCase().includes(k)).slice(0, 8);
+  box.innerHTML = hits.length ? hits.map(h => `<button type="button" data-go="${h[3]}"><span class="m">${esc(h[1])}</span><small>${esc(h[2])}</small></button>`).join('') : '<div class="note" style="margin:8px 10px">没有找到符合的结果</div>';
+  box.hidden = false;
+}
+
+/* ================= 事件 ================= */
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-go]'), a = e.target.closest('[data-act]'), r = e.target.closest('[data-req]');
+  if (r) { S.choice[r.dataset.req] = r.dataset.v; save(); keep(render); return; }
+  if (a && a.tagName !== 'INPUT' && ACT[a.dataset.act]) { e.preventDefault(); ACT[a.dataset.act](a); return; }
+  if (g) { e.preventDefault(); go(g.dataset.go); return; }
+  if (!e.target.closest('.search')) { const b = $('results'); if (b) b.hidden = true; }
+});
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.dataset.act && ACT[t.dataset.act]) { ACT[t.dataset.act](t); return; }
+  if (t.dataset.qs) { S.q[t.dataset.qs] = t.value; if (t.dataset.qs === 'prod') S.q.cost = prodOf(t.value).cost; keep(render); }
+});
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.note) { S.note[t.dataset.note] = t.value; save(); const ex = $('exportText'); if (ex) ex.value = exportText(); }
+  if (t.dataset.q) { const v = parseFloat(t.value); if (!isNaN(v)) { S.q[t.dataset.q] = v; const id = t.id, pos = t.selectionStart; keep(render); const n = $(id); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (_) {} } } }
+  if (t.id === 'q') search(t.value);
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { if (S.drawer) ACT.close(); const b = $('results'); if (b) b.hidden = true; }
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); const q = $('q'); if (q) q.focus(); }
+});
+
+const start = (location.hash || '').replace('#', '');
+S.view = V[start] ? start : 'dash';
+render();
+</script>
+
+</html>
